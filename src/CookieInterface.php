@@ -27,6 +27,13 @@ namespace fkooman\SeCookie;
 interface CookieInterface
 {
     /**
+     * Delete a cookie.
+     *
+     * @param string $name
+     */
+    public function delete($name);
+
+    /**
      * Set a cookie.
      *
      * @param string $name
