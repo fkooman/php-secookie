@@ -26,11 +26,11 @@ namespace fkooman\SeCookie;
 
 interface CookieInterface
 {
+    /**
+     * Set a cookie.
+     *
+     * @param string $name
+     * @param string $value
+     */
     public function set($name, $value);
-
-    public function has($name);
-
-    public function delete($name);
-
-    public function get($name);
 }
