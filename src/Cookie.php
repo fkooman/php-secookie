@@ -62,16 +62,17 @@ class Cookie implements CookieInterface
      */
     public function delete($name)
     {
-        self::set($name, '');
+        self::set($name, '', true);
     }
 
     /**
      * Set a cookie value.
      *
-     * @param string $name  the cookie name
-     * @param string $value the cookie value
+     * @param string $name         the cookie name
+     * @param string $value        the cookie value
+     * @param bool   $deleteCookie tell browser to delete the cookie
      */
-    public function set($name, $value)
+    public function set($name, $value, $deleteCookie = false)
     {
         $attributeValueList = [];
 
@@ -94,6 +95,12 @@ class Cookie implements CookieInterface
 
         if (!is_null($this->cookieOptions['SameSite'])) {
             $attributeValueList[] = sprintf('SameSite=%s', $this->cookieOptions['SameSite']);
+        }
+
+        if ($deleteCookie) {
+            // Max-Age=0 is a special value indicating to the browser that the
+            // cookie has to be deleted...
+            $attributeValueList[] = 'Max-Age=0';
         }
 
         $this->header->set(
