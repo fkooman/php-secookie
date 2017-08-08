@@ -40,7 +40,20 @@ class CookieTest extends PHPUnit_Framework_TestCase
         $c->delete('foo');
         $this->assertSame(
             [
-                'Set-Cookie: foo=; Secure; HttpOnly; SameSite=Strict; Max-Age=0',
+                'Set-Cookie: foo=; Secure; HttpOnly; Max-Age=0; SameSite=Strict',
+            ],
+            $t->ls()
+        );
+    }
+
+    public function testDeleteCookieWithMaxAge()
+    {
+        $t = new TestHeader();
+        $c = new Cookie(['Max-Age' => 12345], $t);
+        $c->delete('foo');
+        $this->assertSame(
+            [
+                'Set-Cookie: foo=; Secure; HttpOnly; Max-Age=0; SameSite=Strict',
             ],
             $t->ls()
         );
