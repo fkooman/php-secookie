@@ -58,8 +58,8 @@ use the `Lax` option for `SameSite`:
     );
     $cookie->set('foo', 'bar');
 
-You can delete a cookie, i.e. set the value to `""` by using the `delete()` 
-method:
+You can delete a cookie, which sets the value to the empty string and 
+`MaxAge=0`, this results in the browser deleting the cookie.
 
     $cookie->delete('foo');
 
