@@ -27,10 +27,10 @@ namespace fkooman\SeCookie;
 class Cookie implements CookieInterface
 {
     /** @var array */
-    private $cookieOptions;
+    protected $cookieOptions;
 
     /** @var HeaderInterface */
-    private $header;
+    protected $header;
 
     /**
      * @param array                $cookieOptions
@@ -59,10 +59,12 @@ class Cookie implements CookieInterface
      * Delete a cookie.
      *
      * @param string $name
+     *
+     * @return void
      */
     public function delete($name)
     {
-        self::set($name, '', true);
+        $this->set($name, '', true);
     }
 
     /**
@@ -71,6 +73,8 @@ class Cookie implements CookieInterface
      * @param string $name         the cookie name
      * @param string $value        the cookie value
      * @param bool   $deleteCookie tell browser to delete the cookie
+     *
+     * @return void
      */
     public function set($name, $value, $deleteCookie = false)
     {
@@ -120,6 +124,8 @@ class Cookie implements CookieInterface
      *
      * @param string $name  the cookie name
      * @param string $value the cookie value
+     *
+     * @return void
      */
     protected function replace($name, $value)
     {
@@ -142,6 +148,6 @@ class Cookie implements CookieInterface
             $this->header->set($cookie, false);
         }
 
-        self::set($name, $value);
+        $this->set($name, $value);
     }
 }

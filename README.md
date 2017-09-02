@@ -69,10 +69,7 @@ Sessions will use the same defaults as Cookies, so you'll get secure sessions
 out of the box. 
 
     $session = new Session();
-    $session->set('foo', 'bar');
-
-Note that the values here are stored _inside_ the session, and not sent to the
-browser!
+    $_SESSION['foo'] = 'bar';
 
 The following configuration options are supported, in addition to the ones 
 already mentioned in the Cookie section:
@@ -84,7 +81,8 @@ already mentioned in the Cookie section:
 * `SessionName`: `string`|`null` (default: `null`)
 
 The format for `SessionExpiry` and `CanaryExpiry` are any string that is 
-accepted by PHP's `DateInterval` [class](https://secure.php.net/manual/en/class.dateinterval.php).
+accepted by PHP's `DateInterval` 
+[class](https://secure.php.net/manual/en/class.dateinterval.php).
 
 You can destroy a session, i.e. empty the `$_SESSION` variable and regenerate 
 the session ID by calling the `destroy()` method:
@@ -95,11 +93,9 @@ You can regenerate the session ID:
 
     $session->regenerate();
 
-It accepts a boolean parameter to delete the session on the server.
- 
-In addition there are methods for `get()`, `set()`, `has()` and `delete()` as 
-well. It is recommended to call `regenerate()` before storing important 
-information in the session, for example after user authentication.
+It accepts a boolean parameter to delete the session on the server. It is 
+recommended to call `regenerate()` before storing important information in the 
+session, for example after user authentication.
 
 ## Session Binding
 

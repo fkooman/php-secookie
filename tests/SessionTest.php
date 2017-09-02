@@ -36,7 +36,6 @@ class SessionTest extends PHPUnit_Framework_TestCase
     {
         $t = new TestHeader();
         $c = new Session([], $t);
-        $c->set('foo', 'bar');
         $this->assertSame(
             [
                 sprintf('Set-Cookie: PHPSESSID=%s; Secure; HttpOnly; SameSite=Strict', $c->id()),
@@ -52,7 +51,6 @@ class SessionTest extends PHPUnit_Framework_TestCase
     {
         $t = new TestHeader();
         $c = new Session(['SessionName' => 'SID'], $t);
-        $c->set('foo', 'bar');
         $this->assertSame(
             [
                 sprintf('Set-Cookie: SID=%s; Secure; HttpOnly; SameSite=Strict', $c->id()),
@@ -132,50 +130,6 @@ class SessionTest extends PHPUnit_Framework_TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testSetGet()
-    {
-        $t = new TestHeader();
-        $c = new Session([], $t);
-        $c->set('foo', 'bar');
-        $this->assertSame('bar', $c->get('foo'));
-    }
-
-    /**
-     * @runInSeparateProcess
-     * @expectedException \fkooman\SeCookie\Exception\SessionException
-     * @expectedExceptionMessage key "foo" not available in session
-     */
-    public function testGetMissing()
-    {
-        $t = new TestHeader();
-        $c = new Session([], $t);
-        $c->get('foo');
-    }
-
-    /**
-     * @runInSeparateProcess
-     */
-    public function testDelete()
-    {
-        $t = new TestHeader();
-        $c = new Session([], $t);
-        $c->set('foo', 'bar');
-        $c->delete('foo');
-    }
-
-    /**
-     * @runInSeparateProcess
-     */
-    public function testDeleteMissing()
-    {
-        $t = new TestHeader();
-        $c = new Session([], $t);
-        $c->delete('foo');
-    }
-
-    /**
-     * @runInSeparateProcess
-     */
     public function testExpiredCanary()
     {
         $t = new TestHeader();
@@ -185,7 +139,6 @@ class SessionTest extends PHPUnit_Framework_TestCase
             ],
             $t
         );
-        $c->set('foo', 'bar');
         $firstId = $c->id();
         sleep(2);
         $c = new Session(
@@ -196,7 +149,6 @@ class SessionTest extends PHPUnit_Framework_TestCase
         );
         $secondId = $c->id();
         $this->assertNotSame($firstId, $secondId);
-        $this->assertTrue($c->has('foo'));
     }
 
     /**
@@ -234,8 +186,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
             ],
             $t
         );
-        $c->set('foo', 'bar');
-        $this->assertTrue($c->has('foo'));
+        $firstId = $c->id();
         sleep(2);
         $c = new Session(
             [
@@ -243,7 +194,8 @@ class SessionTest extends PHPUnit_Framework_TestCase
             ],
             $t
         );
-        $this->assertFalse($c->has('foo'));
+        $secondId = $c->id();
+        $this->assertNotSame($firstId, $secondId);
     }
 
     /**

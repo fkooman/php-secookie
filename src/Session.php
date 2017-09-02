@@ -50,10 +50,7 @@ class Session extends Cookie implements SessionInterface
             $sessionOptions
         );
 
-        if (is_null($header)) {
-            $header = new PhpHeader();
-        }
-        parent::__construct($sessionOptions, $header);
+        parent::__construct($this->sessionOptions, $header);
 
         if (!is_null($this->sessionOptions['SessionName'])) {
             session_name($this->sessionOptions['SessionName']);
@@ -85,6 +82,8 @@ class Session extends Cookie implements SessionInterface
      * Regenerate the session ID.
      *
      * @param bool $deleteOldSession
+     *
+     * @return void
      */
     public function regenerate($deleteOldSession = false)
     {
@@ -93,58 +92,9 @@ class Session extends Cookie implements SessionInterface
     }
 
     /**
-     * Set session value.
-     *
-     * @param string $key
-     * @param mixed  $value
-     */
-    public function set($key, $value)
-    {
-        $_SESSION[$key] = $value;
-    }
-
-    /**
-     * Delete session key/value.
-     *
-     * @param string $key
-     */
-    public function delete($key)
-    {
-        if ($this->has($key)) {
-            unset($_SESSION[$key]);
-        }
-    }
-
-    /**
-     * Test if session key exists.
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function has($key)
-    {
-        return array_key_exists($key, $_SESSION);
-    }
-
-    /**
-     * Get session value.
-     *
-     * @param string $key
-     *
-     * @return mixed
-     */
-    public function get($key)
-    {
-        if (!$this->has($key)) {
-            throw new SessionException(sprintf('key "%s" not available in session', $key));
-        }
-
-        return $_SESSION[$key];
-    }
-
-    /**
      * Empty the session.
+     *
+     * @return void
      */
     public function destroy()
     {
@@ -152,6 +102,9 @@ class Session extends Cookie implements SessionInterface
         $this->regenerate(true);
     }
 
+    /**
+     * @return void
+     */
     private function sessionCanary()
     {
         $dateTime = new DateTime();
@@ -170,11 +123,17 @@ class Session extends Cookie implements SessionInterface
         }
     }
 
+    /**
+     * @return void
+     */
     private function domainBinding()
     {
         $this->sessionBinding('DomainBinding');
     }
 
+    /**
+     * @return void
+     */
     private function pathBinding()
     {
         $this->sessionBinding('PathBinding');
@@ -182,6 +141,8 @@ class Session extends Cookie implements SessionInterface
 
     /**
      * @param string $key
+     *
+     * @return void
      */
     private function sessionBinding($key)
     {
@@ -197,6 +158,8 @@ class Session extends Cookie implements SessionInterface
 
     /**
      * Expire session after a specified time.
+     *
+     * @return void
      */
     private function sessionExpiry()
     {
