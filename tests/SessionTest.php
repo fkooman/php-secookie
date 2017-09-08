@@ -24,7 +24,6 @@
 
 namespace fkooman\SeCookie\Tests;
 
-use fkooman\SeCookie\Cookie;
 use fkooman\SeCookie\Session;
 use PHPUnit_Framework_TestCase;
 
@@ -32,13 +31,11 @@ class SessionTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @runInSeparateProcess
-     *
-     * @return void
      */
     public function testSimple()
     {
         $t = new TestHeader();
-        $c = new Session([], new Cookie([], $t));
+        $c = new Session([], $t);
         $this->assertSame(
             [
                 sprintf('Set-Cookie: PHPSESSID=%s; Secure; HttpOnly; SameSite=Strict', $c->id()),
@@ -49,13 +46,11 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
-     *
-     * @return void
      */
     public function testSessionName()
     {
         $t = new TestHeader();
-        $c = new Session(['SessionName' => 'SID'], new Cookie([], $t));
+        $c = new Session(['SessionName' => 'SID'], $t);
         $this->assertSame(
             [
                 sprintf('Set-Cookie: SID=%s; Secure; HttpOnly; SameSite=Strict', $c->id()),
@@ -66,13 +61,11 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
-     *
-     * @return void
      */
     public function testRegenerate()
     {
         $t = new TestHeader();
-        $c = new Session([], new Cookie([], $t));
+        $c = new Session([], $t);
         $sessionId = $c->id();
         $this->assertSame(
             [
@@ -92,10 +85,8 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
-     * @expectedException        \fkooman\SeCookie\Exception\SessionException
+     * @expectedException \fkooman\SeCookie\Exception\SessionException
      * @expectedExceptionMessage session bound to DomainBinding, we got "www.example.org", but expected "www.example.com"
-     *
-     * @return void
      */
     public function testDomainBinding()
     {
@@ -104,22 +95,20 @@ class SessionTest extends PHPUnit_Framework_TestCase
             [
                 'DomainBinding' => 'www.example.org',
             ],
-            new Cookie([], $t)
+            $t
         );
         $c = new Session(
             [
                 'DomainBinding' => 'www.example.com',
             ],
-            new Cookie([], $t)
+            $t
         );
     }
 
     /**
      * @runInSeparateProcess
-     * @expectedException        \fkooman\SeCookie\Exception\SessionException
+     * @expectedException \fkooman\SeCookie\Exception\SessionException
      * @expectedExceptionMessage session bound to PathBinding, we got "/foo/", but expected "/bar/"
-     *
-     * @return void
      */
     public function testPathBinding()
     {
@@ -128,20 +117,18 @@ class SessionTest extends PHPUnit_Framework_TestCase
             [
                 'PathBinding' => '/foo/',
             ],
-            new Cookie([], $t)
+            $t
         );
         $c = new Session(
             [
                 'PathBinding' => '/bar/',
             ],
-            new Cookie([], $t)
+            $t
         );
     }
 
     /**
      * @runInSeparateProcess
-     *
-     * @return void
      */
     public function testExpiredCanary()
     {
@@ -150,7 +137,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
             [
                 'CanaryExpiry' => 'PT01S',
             ],
-            new Cookie([], $t)
+            $t
         );
         $firstId = $c->id();
         sleep(2);
@@ -158,7 +145,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
             [
                 'CanaryExpiry' => 'PT01S',
             ],
-            new Cookie([], $t)
+            $t
         );
         $secondId = $c->id();
         $this->assertNotSame($firstId, $secondId);
@@ -166,8 +153,6 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
-     *
-     * @return void
      */
     public function testNotExpiredCanary()
     {
@@ -176,14 +161,14 @@ class SessionTest extends PHPUnit_Framework_TestCase
             [
                 'CanaryExpiry' => 'PT01S',
             ],
-            new Cookie([], $t)
+            $t
         );
         $firstId = $c->id();
         $c = new Session(
             [
                 'CanaryExpiry' => 'PT01S',
             ],
-            new Cookie([], $t)
+            $t
         );
         $secondId = $c->id();
         $this->assertSame($firstId, $secondId);
@@ -191,8 +176,6 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
-     *
-     * @return void
      */
     public function testExpiredSession()
     {
@@ -201,7 +184,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
             [
                 'SessionExpiry' => 'PT01S',
             ],
-            new Cookie([], $t)
+            $t
         );
         $firstId = $c->id();
         sleep(2);
@@ -209,7 +192,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
             [
                 'SessionExpiry' => 'PT01S',
             ],
-            new Cookie([], $t)
+            $t
         );
         $secondId = $c->id();
         $this->assertNotSame($firstId, $secondId);
@@ -217,13 +200,11 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
-     *
-     * @return void
      */
     public function testDestroy()
     {
         $t = new TestHeader();
-        $c = new Session([], new Cookie([], $t));
+        $c = new Session([], $t);
         $firstId = $c->id();
         $c->destroy();
         $secondId = $c->id();

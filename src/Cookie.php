@@ -27,10 +27,10 @@ namespace fkooman\SeCookie;
 class Cookie implements CookieInterface
 {
     /** @var array */
-    private $cookieOptions;
+    protected $cookieOptions;
 
     /** @var HeaderInterface */
-    private $header;
+    protected $header;
 
     /**
      * @param array                $cookieOptions
@@ -49,7 +49,7 @@ class Cookie implements CookieInterface
             ],
             $cookieOptions
         );
-        if (null === $header) {
+        if (is_null($header)) {
             $header = new PhpHeader();
         }
         $this->header = $header;
@@ -87,14 +87,14 @@ class Cookie implements CookieInterface
             $attributeValueList[] = 'HttpOnly';
         }
 
-        if (null !== $this->cookieOptions['Path']) {
+        if (!is_null($this->cookieOptions['Path'])) {
             $attributeValueList[] = sprintf('Path=%s', $this->cookieOptions['Path']);
         }
-        if (null !== $this->cookieOptions['Domain']) {
+        if (!is_null($this->cookieOptions['Domain'])) {
             $attributeValueList[] = sprintf('Domain=%s', $this->cookieOptions['Domain']);
         }
 
-        if (null !== $this->cookieOptions['Max-Age'] && !$deleteCookie) {
+        if (!is_null($this->cookieOptions['Max-Age']) && !$deleteCookie) {
             $attributeValueList[] = sprintf('Max-Age=%d', $this->cookieOptions['Max-Age']);
         }
 
@@ -104,7 +104,7 @@ class Cookie implements CookieInterface
             $attributeValueList[] = 'Max-Age=0';
         }
 
-        if (null !== $this->cookieOptions['SameSite']) {
+        if (!is_null($this->cookieOptions['SameSite'])) {
             $attributeValueList[] = sprintf('SameSite=%s', $this->cookieOptions['SameSite']);
         }
 
@@ -127,7 +127,7 @@ class Cookie implements CookieInterface
      *
      * @return void
      */
-    public function replace($name, $value)
+    protected function replace($name, $value)
     {
         $cookieList = [];
         foreach ($this->header->ls() as $hdr) {

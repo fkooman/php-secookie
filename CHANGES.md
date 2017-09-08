@@ -1,15 +1,10 @@
-# Changes
+# ChangeLog
 
-## 2.0.0 (2017-09-08)
-- ran [Psalm](https://getpsalm.org/) on the code and fixed issues;
-- [**API change**] no longer implement `Session::set()`, `Session::get()`, 
-  `Session::has()` and `Session::delete()` but only methods to manage the 
-  session. API consumers have to use `$_SESSION` directly now;
-- [**API change**] `Session` no longer extends `Cookie`, but uses it. You can
-  override the default `Cookie` instance by providing it as the second 
-  parameter in the `Session` constructor. It is NOT possible any longer to 
-  provide `Cookie` settings in the constructor of `Session` (see 
-  [README.md](README.md))
+## 2.0.0 (TBD)
+- ran [Psalm](https://getpsalm.org/) on the code base and fix issues
+- no longer expose `Session::set()`, `Session::get()`, `Session::has()` and 
+  `Session::delete()` but only methods to manage the session. Depending 
+  applications MUST use `$_SESSION` directly
 
 ## 1.0.2 (2017-08-08)
 - fix possible duplicate `Max-Age` when deleting cookie

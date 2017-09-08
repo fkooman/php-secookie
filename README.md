@@ -1,21 +1,23 @@
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/fkooman/php-secookie/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/fkooman/php-secookie/?branch=master)
+
 # Introduction
 
-Secure cookie and session library for PHP.
+Secure Cookie and Session library for PHP.
 
 # Why
 
-* PHP 5.4 support for CentOS 7;
+* PHP >= 5.4 support for CentOS 7;
 * Replace complicated `setcookie()` which is not secure by default (`HttpOnly`, 
   `Secure`, `SameSite` are not the default);
 * [delight-im/cookie](https://github.com/delight-im/PHP-Cookie) and 
   [paragonie/cookie](https://github.com/paragonie/PHP-Cookie), in addition to 
   requiring PHP >= 5.6, parse cookies, which is best avoided for security
-  reasons and code simplicity;
-* Allow binding PHP sessions to "Domain" and "Path" (see below);
-* Easy to use PHP session API;
+  reasons;
+* Allow binding PHP Sessions to "Domain" and "Path" (see below);
+* Easy to use PHP Session API;
 * Uses a "Canary" to regularly refresh session ID;
-* Expires the PHP session on the server;
-* Implements `SameSite` attribute value;
+* Expires the PHP Session on the server;
+* Implements Same-Site attribute value;
 * Unit tests with PHPUnit;
 
 Many of the ideas came from the resources below,
@@ -34,7 +36,7 @@ Setting a cookie, i.e. add the `Set-Cookie` header is straightforward:
     $cookie->set('foo', 'bar');
 
 This will set the cookie using the `Secure`, `HttpOnly` and `SameSite=Strict` 
-values.
+values. 
 
 The following configuration options are supported:
 
@@ -63,13 +65,14 @@ You can delete a cookie, which sets the value to the empty string and
 
 # Sessions
 
-Sessions will use the same defaults as cookies, so you'll get secure sessions
+Sessions will use the same defaults as Cookies, so you'll get secure sessions
 out of the box. 
 
     $session = new Session();
     $_SESSION['foo'] = 'bar';
 
-The following configuration options are supported:
+The following configuration options are supported, in addition to the ones 
+already mentioned in the Cookie section:
 
 * `DomainBinding`: `string`|`null` (default: `null`), see "Session Binding"
 * `PathBinding`: `string`|`null` (default: `null`), see "Session Binding"
@@ -78,22 +81,8 @@ The following configuration options are supported:
 * `SessionName`: `string`|`null` (default: `null`)
 
 The format for `SessionExpiry` and `CanaryExpiry` are any string that is 
-accepted by PHP's 
-[DateInterval](https://secure.php.net/manual/en/class.dateinterval.php).
-
-If you want to modify the default cookie options, you can provide an instance
-of `Cookie` as the second parameter:
-
-    $session = new Session(
-        [
-            'SessionName' => 'foo'
-        ], 
-        new Cookie(
-            [
-                'Path' => '/foo'
-            ]
-        )
-    );
+accepted by PHP's `DateInterval` 
+[class](https://secure.php.net/manual/en/class.dateinterval.php).
 
 You can destroy a session, i.e. empty the `$_SESSION` variable and regenerate 
 the session ID by calling the `destroy()` method:
@@ -110,7 +99,7 @@ session, for example after user authentication.
 
 ## Session Binding
 
-Session binding is implemented to avoid using a PHP session meant for one 
+Session binding is implemented to avoid using a PHP Session meant for one 
 "Domain" or "Path" being used at another Domain or Path. This is important if 
 you are hosting a "multi-site" application where the site is running at 
 multiple domains, but shares the same PHP session storage.
@@ -124,17 +113,16 @@ This can be used like this:
         ]
     );
 
-This does *not* restrict the `Domain` and `Path` options for the cookie, to 
-modify these you'd have to also specify the `Domain` and `Path` options in the
-`Cookie` object provided as the second argument to the `Session` constructor, 
-but leaving them empty can result in more secure cookies as they will be 
+This does *not* restrict the `Domain` and `Path` options for the Cookie, to 
+modify these you'd have to also specify the `Domain` and `Path` options, but
+leaving them empty can result in more secure cookies as they will be 
 automatically bound to the "Path" and "Domain" that set them, see 
 _The definitive guide to cookie domains and why a www-prefix makes your website safer_
 linked in the resources below.
 
 ## Session Expiry
 
-The PHP session typically lives as long as the user's user agent, i.e. browser, 
+The PHP Session typically lives as long as the user's user agent, i.e. browser, 
 runs. On many platforms the browser is not closed anymore and remains open 
 indefinitely, or as least until the device is restarted, e.g. on mobile.
 
@@ -152,7 +140,7 @@ To disable session expiry, you can set the `SessionExpiry` to `null`.
 
 # Security
 
-It is **very** important that you update your PHP session settings in 
+It is **very** important that you update your PHP Session settings in 
 `php.ini` on your host. See _The Fast Track to Safe and Secure PHP Sessions_, 
 linked below in the resources.
 
@@ -164,9 +152,6 @@ linked below in the resources.
     ;
     session.save_handler = files
     session.save_path = "/var/lib/php/session"
-    ; use this save_path on Debian
-    ;session.save_path = "/var/lib/php/sessions"
-
     session.use_cookies = 1
     session.use_only_cookies = 1
 
