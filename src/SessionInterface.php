@@ -30,5 +30,13 @@ interface SessionInterface
 
     public function regenerate($deleteOldSession = false);
 
+    public function set($key, $value);
+
+    public function delete($key);
+
+    public function has($key);
+
+    public function get($key);
+
     public function destroy();
 }

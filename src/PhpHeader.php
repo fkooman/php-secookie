@@ -30,8 +30,6 @@ class PhpHeader implements HeaderInterface
      * Remove all headers with this name.
      *
      * @param string $name
-     *
-     * @return void
      */
     public function remove($name)
     {
@@ -43,8 +41,6 @@ class PhpHeader implements HeaderInterface
      *
      * @param string $header
      * @param bool   $replace replace all existing headers with this name
-     *
-     * @return void
      */
     public function set($header, $replace = true)
     {
