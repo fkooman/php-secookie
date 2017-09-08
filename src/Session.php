@@ -28,16 +28,19 @@ use DateInterval;
 use DateTime;
 use fkooman\SeCookie\Exception\SessionException;
 
-class Session extends Cookie implements SessionInterface
+class Session implements SessionInterface
 {
     /** @var array */
     private $sessionOptions;
 
+    /** @var Cookie */
+    private $cookie;
+
     /**
-     * @param array                $sessionOptions
-     * @param HeaderInterface|null $header
+     * @param array       $sessionOptions
+     * @param Cookie|null $cookie
      */
-    public function __construct(array $sessionOptions = [], HeaderInterface $header = null)
+    public function __construct(array $sessionOptions = [], Cookie $cookie = null)
     {
         $this->sessionOptions = array_merge(
             [
@@ -50,9 +53,12 @@ class Session extends Cookie implements SessionInterface
             $sessionOptions
         );
 
-        parent::__construct($this->sessionOptions, $header);
+        if (null === $cookie) {
+            $cookie = new Cookie();
+        }
+        $this->cookie = $cookie;
 
-        if (!is_null($this->sessionOptions['SessionName'])) {
+        if (null !== $this->sessionOptions['SessionName']) {
             session_name($this->sessionOptions['SessionName']);
         }
 
@@ -65,7 +71,7 @@ class Session extends Cookie implements SessionInterface
         $this->pathBinding();
         $this->sessionExpiry();
 
-        $this->replace(session_name(), session_id());
+        $this->cookie->replace(session_name(), session_id());
     }
 
     /**
@@ -88,7 +94,7 @@ class Session extends Cookie implements SessionInterface
     public function regenerate($deleteOldSession = false)
     {
         session_regenerate_id($deleteOldSession);
-        $this->replace(session_name(), session_id());
+        $this->cookie->replace(session_name(), session_id());
     }
 
     /**
@@ -146,7 +152,7 @@ class Session extends Cookie implements SessionInterface
      */
     private function sessionBinding($key)
     {
-        if (!is_null($this->sessionOptions[$key])) {
+        if (null !== $this->sessionOptions[$key]) {
             if (!array_key_exists($key, $_SESSION)) {
                 $_SESSION[$key] = $this->sessionOptions[$key];
             }
@@ -164,7 +170,7 @@ class Session extends Cookie implements SessionInterface
     private function sessionExpiry()
     {
         $dateTime = new DateTime();
-        if (!is_null($this->sessionOptions['SessionExpiry'])) {
+        if (null !== $this->sessionOptions['SessionExpiry']) {
             $expiryDateTime = new DateTime($_SESSION['Expiry']);
             $expiryDateTime->add(new DateInterval($this->sessionOptions['SessionExpiry']));
             if ($expiryDateTime < $dateTime) {
