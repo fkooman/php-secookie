@@ -2,22 +2,22 @@
 
 # Introduction
 
-Secure Cookie and Session library for PHP.
+Secure cookie and session library for PHP.
 
 # Why
 
-* PHP >= 5.4 support for CentOS 7;
+* PHP >= 5.4 supported (CentOS 7 default PHP is supported);
 * Replace complicated `setcookie()` which is not secure by default (`HttpOnly`, 
   `Secure`, `SameSite` are not the default);
 * [delight-im/cookie](https://github.com/delight-im/PHP-Cookie) and 
   [paragonie/cookie](https://github.com/paragonie/PHP-Cookie), in addition to 
   requiring PHP >= 5.6, parse cookies, which is best avoided for security
-  reasons;
-* Allow binding PHP Sessions to "Domain" and "Path" (see below);
-* Easy to use PHP Session API;
+  reasons and code simplicity;
+* Allow binding PHP sessions to "Domain" and "Path" (see below);
+* Easy to use PHP session API;
 * Uses a "Canary" to regularly refresh session ID;
-* Expires the PHP Session on the server;
-* Implements Same-Site attribute value;
+* Expires the PHP session on the server;
+* Implements `SameSite` attribute value;
 * Unit tests with PHPUnit;
 
 Many of the ideas came from the resources below,
@@ -74,8 +74,7 @@ out of the box.
 Note that the values here are stored _inside_ the session, and not sent to the
 browser!
 
-The following configuration options are supported, in addition to the ones 
-already mentioned in the Cookie section:
+The following configuration options are supported:
 
 * `DomainBinding`: `string`|`null` (default: `null`), see "Session Binding"
 * `PathBinding`: `string`|`null` (default: `null`), see "Session Binding"
@@ -101,9 +100,23 @@ In addition there are methods for `get()`, `set()`, `has()` and `delete()` as
 well. It is recommended to call `regenerate()` before storing important 
 information in the session, for example after user authentication.
 
+## Cookie Settings
+
+If you want to override the cookie settings, you can provide the a `Cookie` 
+instance as the second parameter to the `Session` constructor, e.g.:
+
+    $session = new Session(
+        [],
+        new Cookie(
+            [
+               'SameSite' => 'Lax'
+            ]
+        )
+    );
+
 ## Session Binding
 
-Session binding is implemented to avoid using a PHP Session meant for one 
+Session binding is implemented to avoid using a PHP session meant for one 
 "Domain" or "Path" being used at another Domain or Path. This is important if 
 you are hosting a "multi-site" application where the site is running at 
 multiple domains, but shares the same PHP session storage.
@@ -118,15 +131,15 @@ This can be used like this:
     );
 
 This does *not* restrict the `Domain` and `Path` options for the Cookie, to 
-modify these you'd have to also specify the `Domain` and `Path` options, but
-leaving them empty can result in more secure cookies as they will be 
-automatically bound to the "Path" and "Domain" that set them, see 
+modify these you'd have to provide your own `Cookie` instance as parameter to 
+the `Session` constructor. But _NOT_ specifying them may result in more secure 
+cookies as they will be automatically bound to the "Path" and "Domain", see 
 _The definitive guide to cookie domains and why a www-prefix makes your website safer_
 linked in the resources below.
 
 ## Session Expiry
 
-The PHP Session typically lives as long as the user's user agent, i.e. browser, 
+The PHP session typically lives as long as the user's user agent, i.e. browser, 
 runs. On many platforms the browser is not closed anymore and remains open 
 indefinitely, or as least until the device is restarted, e.g. on mobile.
 
@@ -144,7 +157,7 @@ To disable session expiry, you can set the `SessionExpiry` to `null`.
 
 # Security
 
-It is **very** important that you update your PHP Session settings in 
+It is **very** important that you update your PHP session settings in 
 `php.ini` on your host. See _The Fast Track to Safe and Secure PHP Sessions_, 
 linked below in the resources.
 
@@ -156,6 +169,8 @@ linked below in the resources.
     ;
     session.save_handler = files
     session.save_path = "/var/lib/php/session"
+    ; On Debian
+    ;session.save_path = "/var/lib/php/sessions"
     session.use_cookies = 1
     session.use_only_cookies = 1
 
