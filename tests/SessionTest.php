@@ -24,6 +24,7 @@
 
 namespace fkooman\SeCookie\Tests;
 
+use fkooman\SeCookie\Cookie;
 use fkooman\SeCookie\Session;
 use PHPUnit_Framework_TestCase;
 
@@ -37,7 +38,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
     public function testSimple()
     {
         $t = new TestHeader();
-        $c = new Session([], $t);
+        $c = new Session([], new Cookie([], $t));
         $c->set('foo', 'bar');
         $this->assertSame(
             [
@@ -55,7 +56,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
     public function testSessionName()
     {
         $t = new TestHeader();
-        $c = new Session(['SessionName' => 'SID'], $t);
+        $c = new Session(['SessionName' => 'SID'], new Cookie([], $t));
         $c->set('foo', 'bar');
         $this->assertSame(
             [
@@ -73,7 +74,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
     public function testRegenerate()
     {
         $t = new TestHeader();
-        $c = new Session([], $t);
+        $c = new Session([], new Cookie([], $t));
         $sessionId = $c->id();
         $this->assertSame(
             [
@@ -105,13 +106,13 @@ class SessionTest extends PHPUnit_Framework_TestCase
             [
                 'DomainBinding' => 'www.example.org',
             ],
-            $t
+            new Cookie([], $t)
         );
         $c = new Session(
             [
                 'DomainBinding' => 'www.example.com',
             ],
-            $t
+            new Cookie([], $t)
         );
     }
 
@@ -129,13 +130,13 @@ class SessionTest extends PHPUnit_Framework_TestCase
             [
                 'PathBinding' => '/foo/',
             ],
-            $t
+            new Cookie([], $t)
         );
         $c = new Session(
             [
                 'PathBinding' => '/bar/',
             ],
-            $t
+            new Cookie([], $t)
         );
     }
 
@@ -147,7 +148,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
     public function testSetGet()
     {
         $t = new TestHeader();
-        $c = new Session([], $t);
+        $c = new Session([], new Cookie([], $t));
         $c->set('foo', 'bar');
         $this->assertSame('bar', $c->get('foo'));
     }
@@ -162,7 +163,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
     public function testGetMissing()
     {
         $t = new TestHeader();
-        $c = new Session([], $t);
+        $c = new Session([], new Cookie([], $t));
         $c->get('foo');
     }
 
@@ -174,7 +175,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
     public function testDelete()
     {
         $t = new TestHeader();
-        $c = new Session([], $t);
+        $c = new Session([], new Cookie([], $t));
         $c->set('foo', 'bar');
         $c->delete('foo');
     }
@@ -187,7 +188,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
     public function testDeleteMissing()
     {
         $t = new TestHeader();
-        $c = new Session([], $t);
+        $c = new Session([], new Cookie([], $t));
         $c->delete('foo');
     }
 
@@ -203,7 +204,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
             [
                 'CanaryExpiry' => 'PT01S',
             ],
-            $t
+            new Cookie([], $t)
         );
         $c->set('foo', 'bar');
         $firstId = $c->id();
@@ -212,7 +213,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
             [
                 'CanaryExpiry' => 'PT01S',
             ],
-            $t
+            new Cookie([], $t)
         );
         $secondId = $c->id();
         $this->assertNotSame($firstId, $secondId);
@@ -231,14 +232,14 @@ class SessionTest extends PHPUnit_Framework_TestCase
             [
                 'CanaryExpiry' => 'PT01S',
             ],
-            $t
+            new Cookie([], $t)
         );
         $firstId = $c->id();
         $c = new Session(
             [
                 'CanaryExpiry' => 'PT01S',
             ],
-            $t
+            new Cookie([], $t)
         );
         $secondId = $c->id();
         $this->assertSame($firstId, $secondId);
@@ -256,7 +257,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
             [
                 'SessionExpiry' => 'PT01S',
             ],
-            $t
+            new Cookie([], $t)
         );
         $c->set('foo', 'bar');
         $this->assertTrue($c->has('foo'));
@@ -265,7 +266,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
             [
                 'SessionExpiry' => 'PT01S',
             ],
-            $t
+            new Cookie([], $t)
         );
         $this->assertFalse($c->has('foo'));
     }
@@ -278,7 +279,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
     public function testDestroy()
     {
         $t = new TestHeader();
-        $c = new Session([], $t);
+        $c = new Session([], new Cookie([], $t));
         $firstId = $c->id();
         $c->destroy();
         $secondId = $c->id();

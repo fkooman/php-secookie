@@ -49,7 +49,7 @@ class Cookie implements CookieInterface
             ],
             $cookieOptions
         );
-        if (is_null($header)) {
+        if (null === $header) {
             $header = new PhpHeader();
         }
         $this->header = $header;
@@ -64,7 +64,7 @@ class Cookie implements CookieInterface
      */
     public function delete($name)
     {
-        self::set($name, '', true);
+        $this->set($name, '', true);
     }
 
     /**
@@ -87,14 +87,14 @@ class Cookie implements CookieInterface
             $attributeValueList[] = 'HttpOnly';
         }
 
-        if (!is_null($this->cookieOptions['Path'])) {
+        if (null !== $this->cookieOptions['Path']) {
             $attributeValueList[] = sprintf('Path=%s', $this->cookieOptions['Path']);
         }
-        if (!is_null($this->cookieOptions['Domain'])) {
+        if (null !== $this->cookieOptions['Domain']) {
             $attributeValueList[] = sprintf('Domain=%s', $this->cookieOptions['Domain']);
         }
 
-        if (!is_null($this->cookieOptions['Max-Age']) && !$deleteCookie) {
+        if (null !== $this->cookieOptions['Max-Age'] && !$deleteCookie) {
             $attributeValueList[] = sprintf('Max-Age=%d', $this->cookieOptions['Max-Age']);
         }
 
@@ -104,7 +104,7 @@ class Cookie implements CookieInterface
             $attributeValueList[] = 'Max-Age=0';
         }
 
-        if (!is_null($this->cookieOptions['SameSite'])) {
+        if (null !== $this->cookieOptions['SameSite']) {
             $attributeValueList[] = sprintf('SameSite=%s', $this->cookieOptions['SameSite']);
         }
 
@@ -127,7 +127,7 @@ class Cookie implements CookieInterface
      *
      * @return void
      */
-    protected function replace($name, $value)
+    public function replace($name, $value)
     {
         $cookieList = [];
         foreach ($this->header->ls() as $hdr) {
@@ -148,6 +148,6 @@ class Cookie implements CookieInterface
             $this->header->set($cookie, false);
         }
 
-        self::set($name, $value);
+        $this->set($name, $value);
     }
 }
