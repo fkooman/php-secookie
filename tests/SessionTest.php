@@ -31,6 +31,8 @@ class SessionTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @runInSeparateProcess
+     *
+     * @return void
      */
     public function testSimple()
     {
@@ -47,6 +49,8 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
+     *
+     * @return void
      */
     public function testSessionName()
     {
@@ -63,6 +67,8 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
+     *
+     * @return void
      */
     public function testRegenerate()
     {
@@ -87,8 +93,10 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
-     * @expectedException \fkooman\SeCookie\Exception\SessionException
+     * @expectedException        \fkooman\SeCookie\Exception\SessionException
      * @expectedExceptionMessage session bound to DomainBinding, we got "www.example.org", but expected "www.example.com"
+     *
+     * @return void
      */
     public function testDomainBinding()
     {
@@ -109,8 +117,10 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
-     * @expectedException \fkooman\SeCookie\Exception\SessionException
+     * @expectedException        \fkooman\SeCookie\Exception\SessionException
      * @expectedExceptionMessage session bound to PathBinding, we got "/foo/", but expected "/bar/"
+     *
+     * @return void
      */
     public function testPathBinding()
     {
@@ -131,6 +141,8 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
+     *
+     * @return void
      */
     public function testSetGet()
     {
@@ -142,8 +154,10 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
-     * @expectedException \fkooman\SeCookie\Exception\SessionException
+     * @expectedException        \fkooman\SeCookie\Exception\SessionException
      * @expectedExceptionMessage key "foo" not available in session
+     *
+     * @return void
      */
     public function testGetMissing()
     {
@@ -154,6 +168,8 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
+     *
+     * @return void
      */
     public function testDelete()
     {
@@ -165,6 +181,8 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
+     *
+     * @return void
      */
     public function testDeleteMissing()
     {
@@ -175,6 +193,8 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
+     *
+     * @return void
      */
     public function testExpiredCanary()
     {
@@ -201,6 +221,8 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
+     *
+     * @return void
      */
     public function testNotExpiredCanary()
     {
@@ -224,6 +246,8 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
+     *
+     * @return void
      */
     public function testExpiredSession()
     {
@@ -248,6 +272,8 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
+     *
+     * @return void
      */
     public function testDestroy()
     {

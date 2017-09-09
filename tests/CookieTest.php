@@ -29,10 +29,16 @@ use PHPUnit_Framework_TestCase;
 
 class CookieTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @return void
+     */
     public function testSimple()
     {
     }
 
+    /**
+     * @return void
+     */
     public function testDeleteCookie()
     {
         $t = new TestHeader();
@@ -46,6 +52,9 @@ class CookieTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return void
+     */
     public function testDeleteCookieWithMaxAge()
     {
         $t = new TestHeader();
@@ -59,6 +68,9 @@ class CookieTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return void
+     */
     public function testAttributeValues()
     {
         $t = new TestHeader();
@@ -79,6 +91,9 @@ class CookieTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return void
+     */
     public function testDomain()
     {
     }

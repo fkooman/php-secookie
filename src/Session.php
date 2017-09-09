@@ -72,9 +72,7 @@ class Session extends Cookie implements SessionInterface
     }
 
     /**
-     * Get the session ID.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function id()
     {
@@ -82,9 +80,7 @@ class Session extends Cookie implements SessionInterface
     }
 
     /**
-     * Regenerate the session ID.
-     *
-     * @param bool $deleteOldSession
+     * {@inheritdoc}
      */
     public function regenerate($deleteOldSession = false)
     {
@@ -93,10 +89,7 @@ class Session extends Cookie implements SessionInterface
     }
 
     /**
-     * Set session value.
-     *
-     * @param string $key
-     * @param mixed  $value
+     * {@inheritdoc}
      */
     public function set($key, $value)
     {
@@ -104,9 +97,7 @@ class Session extends Cookie implements SessionInterface
     }
 
     /**
-     * Delete session key/value.
-     *
-     * @param string $key
+     * {@inheritdoc}
      */
     public function delete($key)
     {
@@ -116,11 +107,7 @@ class Session extends Cookie implements SessionInterface
     }
 
     /**
-     * Test if session key exists.
-     *
-     * @param string $key
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function has($key)
     {
@@ -128,11 +115,7 @@ class Session extends Cookie implements SessionInterface
     }
 
     /**
-     * Get session value.
-     *
-     * @param string $key
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function get($key)
     {
@@ -144,7 +127,7 @@ class Session extends Cookie implements SessionInterface
     }
 
     /**
-     * Empty the session.
+     * {@inheritdoc}
      */
     public function destroy()
     {
@@ -152,6 +135,9 @@ class Session extends Cookie implements SessionInterface
         $this->regenerate(true);
     }
 
+    /**
+     * @return void
+     */
     private function sessionCanary()
     {
         $dateTime = new DateTime();
@@ -170,11 +156,17 @@ class Session extends Cookie implements SessionInterface
         }
     }
 
+    /**
+     * @return void
+     */
     private function domainBinding()
     {
         $this->sessionBinding('DomainBinding');
     }
 
+    /**
+     * @return void
+     */
     private function pathBinding()
     {
         $this->sessionBinding('PathBinding');
@@ -182,6 +174,8 @@ class Session extends Cookie implements SessionInterface
 
     /**
      * @param string $key
+     *
+     * @return void
      */
     private function sessionBinding($key)
     {
@@ -197,6 +191,8 @@ class Session extends Cookie implements SessionInterface
 
     /**
      * Expire session after a specified time.
+     *
+     * @return void
      */
     private function sessionExpiry()
     {

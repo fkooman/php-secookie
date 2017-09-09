@@ -26,17 +26,63 @@ namespace fkooman\SeCookie;
 
 interface SessionInterface
 {
+    /**
+     * Get the session ID.
+     *
+     * @return string
+     */
     public function id();
 
+    /**
+     * Regenerate the session ID.
+     *
+     * @param bool $deleteOldSession
+     *
+     * @return void
+     */
     public function regenerate($deleteOldSession = false);
 
+    /**
+     * Set session value.
+     *
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return void
+     */
     public function set($key, $value);
 
+    /**
+     * Delete session key/value.
+     *
+     * @param string $key
+     *
+     * @return void
+     */
     public function delete($key);
 
+    /**
+     * Test if session key exists.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
     public function has($key);
 
+    /**
+     * Get session value.
+     *
+     * @param string $key
+     *
+     * @return mixed
+     */
     public function get($key);
 
+    /**
+     * Empty the session.
+     *
+     * @return void
+     */
     public function destroy();
 }
