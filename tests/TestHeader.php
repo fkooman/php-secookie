@@ -32,6 +32,8 @@ class TestHeader implements HeaderInterface
     private $headerList = [];
 
     /**
+     * @param mixed $name
+     *
      * @return void
      */
     public function remove($name)
@@ -44,6 +46,9 @@ class TestHeader implements HeaderInterface
     }
 
     /**
+     * @param mixed $header
+     * @param mixed $override
+     *
      * @return void
      */
     public function set($header, $override = false)
