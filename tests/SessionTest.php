@@ -177,7 +177,9 @@ class SessionTest extends PHPUnit_Framework_TestCase
         $t = new TestHeader();
         $c = new Session([], new Cookie([], $t));
         $c->set('foo', 'bar');
+        $this->assertTrue($c->has('foo'));
         $c->delete('foo');
+        $this->assertFalse($c->has('foo'));
     }
 
     /**
@@ -189,7 +191,9 @@ class SessionTest extends PHPUnit_Framework_TestCase
     {
         $t = new TestHeader();
         $c = new Session([], new Cookie([], $t));
+        $this->assertFalse($c->has('foo'));
         $c->delete('foo');
+        $this->assertFalse($c->has('foo'));
     }
 
     /**

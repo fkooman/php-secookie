@@ -32,8 +32,27 @@ class CookieTest extends PHPUnit_Framework_TestCase
     /**
      * @return void
      */
+    public function testNoCookie()
+    {
+        $t = new TestHeader();
+        $c = new Cookie([], $t);
+        $this->assertSame([], $t->ls());
+    }
+
+    /**
+     * @return void
+     */
     public function testSimple()
     {
+        $t = new TestHeader();
+        $c = new Cookie([], $t);
+        $c->set('foo', 'bar');
+        $this->assertSame(
+            [
+                'Set-Cookie: foo=bar; Secure; HttpOnly; SameSite=Strict',
+            ],
+            $t->ls()
+        );
     }
 
     /**
@@ -108,12 +127,5 @@ class CookieTest extends PHPUnit_Framework_TestCase
             ],
             $t->ls()
         );
-    }
-
-    /**
-     * @return void
-     */
-    public function testDomain()
-    {
     }
 }
