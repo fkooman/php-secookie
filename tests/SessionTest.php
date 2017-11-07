@@ -26,9 +26,9 @@ namespace fkooman\SeCookie\Tests;
 
 use fkooman\SeCookie\Cookie;
 use fkooman\SeCookie\Session;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class SessionTest extends PHPUnit_Framework_TestCase
+class SessionTest extends TestCase
 {
     /**
      * @runInSeparateProcess

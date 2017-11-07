@@ -25,9 +25,9 @@
 namespace fkooman\SeCookie\Tests;
 
 use fkooman\SeCookie\Cookie;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class CookieTest extends PHPUnit_Framework_TestCase
+class CookieTest extends TestCase
 {
     /**
      * @return void

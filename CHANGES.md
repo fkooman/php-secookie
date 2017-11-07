@@ -1,5 +1,8 @@
 # ChangeLog
 
+## 2.0.1 (...)
+- add support for PHPUnit 6
+
 ## 2.0.0 (2017-09-10)
 - change `Session` constructor to take `Cookie` instance instead of 
   `HeaderInterface` to have a much cleaner implementation and separation of 
