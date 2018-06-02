@@ -11,6 +11,7 @@ return PhpCsFixer\Config::create()
             'array_syntax' => ['syntax' => 'short'],
             'phpdoc_order' => true,
             'phpdoc_no_empty_return' => false,
+            'native_function_invocation' => true,
             'phpdoc_add_missing_param_annotation' => true,
             'strict_comparison' => true,
             'strict_param' => true,

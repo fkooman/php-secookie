@@ -42,7 +42,7 @@ class SessionTest extends TestCase
         $c->set('foo', 'bar');
         $this->assertSame(
             [
-                sprintf('Set-Cookie: PHPSESSID=%s; Secure; HttpOnly; SameSite=Strict', $c->id()),
+                \sprintf('Set-Cookie: PHPSESSID=%s; Secure; HttpOnly; SameSite=Strict', $c->id()),
             ],
             $t->ls()
         );
@@ -60,7 +60,7 @@ class SessionTest extends TestCase
         $c->set('foo', 'bar');
         $this->assertSame(
             [
-                sprintf('Set-Cookie: SID=%s; Secure; HttpOnly; SameSite=Strict', $c->id()),
+                \sprintf('Set-Cookie: SID=%s; Secure; HttpOnly; SameSite=Strict', $c->id()),
             ],
             $t->ls()
         );
@@ -78,7 +78,7 @@ class SessionTest extends TestCase
         $sessionId = $c->id();
         $this->assertSame(
             [
-                sprintf('Set-Cookie: PHPSESSID=%s; Secure; HttpOnly; SameSite=Strict', $sessionId),
+                \sprintf('Set-Cookie: PHPSESSID=%s; Secure; HttpOnly; SameSite=Strict', $sessionId),
             ],
             $t->ls()
         );
@@ -86,7 +86,7 @@ class SessionTest extends TestCase
         $sessionId = $c->id();
         $this->assertSame(
             [
-                sprintf('Set-Cookie: PHPSESSID=%s; Secure; HttpOnly; SameSite=Strict', $sessionId),
+                \sprintf('Set-Cookie: PHPSESSID=%s; Secure; HttpOnly; SameSite=Strict', $sessionId),
             ],
             $t->ls()
         );
@@ -212,7 +212,7 @@ class SessionTest extends TestCase
         );
         $c->set('foo', 'bar');
         $firstId = $c->id();
-        sleep(2);
+        \sleep(2);
         $c = new Session(
             [
                 'CanaryExpiry' => 'PT01S',
@@ -265,7 +265,7 @@ class SessionTest extends TestCase
         );
         $c->set('foo', 'bar');
         $this->assertTrue($c->has('foo'));
-        sleep(2);
+        \sleep(2);
         $c = new Session(
             [
                 'SessionExpiry' => 'PT01S',
@@ -290,7 +290,7 @@ class SessionTest extends TestCase
         $this->assertNotSame($firstId, $secondId);
         $this->assertSame(
             [
-                sprintf('Set-Cookie: PHPSESSID=%s; Secure; HttpOnly; SameSite=Strict', $secondId),
+                \sprintf('Set-Cookie: PHPSESSID=%s; Secure; HttpOnly; SameSite=Strict', $secondId),
             ],
             $t->ls()
         );

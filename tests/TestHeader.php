@@ -39,7 +39,7 @@ class TestHeader implements HeaderInterface
     public function remove($name)
     {
         foreach ($this->headerList as $k => $v) {
-            if (0 === stripos($v, sprintf('%s: ', $name))) {
+            if (0 === \stripos($v, \sprintf('%s: ', $name))) {
                 unset($this->headerList[$k]);
             }
         }
@@ -58,6 +58,6 @@ class TestHeader implements HeaderInterface
 
     public function ls()
     {
-        return array_values($this->headerList);
+        return \array_values($this->headerList);
     }
 }

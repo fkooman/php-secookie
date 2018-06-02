@@ -38,7 +38,7 @@ class Cookie implements CookieInterface
      */
     public function __construct(array $cookieOptions = [], HeaderInterface $header = null)
     {
-        $this->cookieOptions = array_merge(
+        $this->cookieOptions = \array_merge(
             [
                 'Secure' => true,       // bool
                 'HttpOnly' => true,     // bool
@@ -88,14 +88,14 @@ class Cookie implements CookieInterface
         }
 
         if (null !== $this->cookieOptions['Path']) {
-            $attributeValueList[] = sprintf('Path=%s', $this->cookieOptions['Path']);
+            $attributeValueList[] = \sprintf('Path=%s', $this->cookieOptions['Path']);
         }
         if (null !== $this->cookieOptions['Domain']) {
-            $attributeValueList[] = sprintf('Domain=%s', $this->cookieOptions['Domain']);
+            $attributeValueList[] = \sprintf('Domain=%s', $this->cookieOptions['Domain']);
         }
 
         if (null !== $this->cookieOptions['Max-Age'] && !$deleteCookie) {
-            $attributeValueList[] = sprintf('Max-Age=%d', $this->cookieOptions['Max-Age']);
+            $attributeValueList[] = \sprintf('Max-Age=%d', $this->cookieOptions['Max-Age']);
         }
 
         if ($deleteCookie) {
@@ -105,15 +105,15 @@ class Cookie implements CookieInterface
         }
 
         if (null !== $this->cookieOptions['SameSite']) {
-            $attributeValueList[] = sprintf('SameSite=%s', $this->cookieOptions['SameSite']);
+            $attributeValueList[] = \sprintf('SameSite=%s', $this->cookieOptions['SameSite']);
         }
 
         $this->header->set(
-            sprintf(
+            \sprintf(
                 'Set-Cookie: %s=%s; %s',
                 $name,
                 $value,
-                implode('; ', $attributeValueList)
+                \implode('; ', $attributeValueList)
             ),
             false // do not replace
         );
@@ -131,9 +131,9 @@ class Cookie implements CookieInterface
     {
         $cookieList = [];
         foreach ($this->header->ls() as $hdr) {
-            if (0 === stripos($hdr, 'Set-Cookie: ')) {
+            if (0 === \stripos($hdr, 'Set-Cookie: ')) {
                 // found "Set-Cookie"
-                if (0 !== stripos($hdr, sprintf('Set-Cookie: %s=', $name))) {
+                if (0 !== \stripos($hdr, \sprintf('Set-Cookie: %s=', $name))) {
                     // not the one we want to replace, add to backup list
                     $cookieList[] = $hdr;
                 }

@@ -35,7 +35,7 @@ class PhpHeader implements HeaderInterface
      */
     public function remove($name)
     {
-        header_remove($name);
+        \header_remove($name);
     }
 
     /**
@@ -48,7 +48,7 @@ class PhpHeader implements HeaderInterface
      */
     public function set($header, $replace = true)
     {
-        header($header, $replace);
+        \header($header, $replace);
     }
 
     /**
@@ -58,6 +58,6 @@ class PhpHeader implements HeaderInterface
      */
     public function ls()
     {
-        return headers_list();
+        return \headers_list();
     }
 }

@@ -42,7 +42,7 @@ class Session implements SessionInterface
      */
     public function __construct(array $sessionOptions = [], Cookie $cookie = null)
     {
-        $this->sessionOptions = array_merge(
+        $this->sessionOptions = \array_merge(
             [
                 'SessionExpiry' => 'PT08H', // expire session (8 hours)
                 'CanaryExpiry' => 'PT01H',  // regenerate session ID (1 hour)
@@ -59,11 +59,11 @@ class Session implements SessionInterface
         $this->cookie = $cookie;
 
         if (null !== $this->sessionOptions['SessionName']) {
-            session_name($this->sessionOptions['SessionName']);
+            \session_name($this->sessionOptions['SessionName']);
         }
 
-        if (PHP_SESSION_ACTIVE !== session_status()) {
-            session_start();
+        if (PHP_SESSION_ACTIVE !== \session_status()) {
+            \session_start();
         }
 
         $this->sessionCanary();
@@ -71,7 +71,7 @@ class Session implements SessionInterface
         $this->pathBinding();
         $this->sessionExpiry();
 
-        $this->cookie->replace(session_name(), session_id());
+        $this->cookie->replace(\session_name(), \session_id());
     }
 
     /**
@@ -79,7 +79,7 @@ class Session implements SessionInterface
      */
     public function id()
     {
-        return session_id();
+        return \session_id();
     }
 
     /**
@@ -87,8 +87,8 @@ class Session implements SessionInterface
      */
     public function regenerate($deleteOldSession = false)
     {
-        session_regenerate_id($deleteOldSession);
-        $this->cookie->replace(session_name(), session_id());
+        \session_regenerate_id($deleteOldSession);
+        $this->cookie->replace(\session_name(), \session_id());
     }
 
     /**
@@ -114,7 +114,7 @@ class Session implements SessionInterface
      */
     public function has($key)
     {
-        return array_key_exists($key, $_SESSION);
+        return \array_key_exists($key, $_SESSION);
     }
 
     /**
@@ -123,7 +123,7 @@ class Session implements SessionInterface
     public function get($key)
     {
         if (!$this->has($key)) {
-            throw new SessionException(sprintf('key "%s" not available in session', $key));
+            throw new SessionException(\sprintf('key "%s" not available in session', $key));
         }
 
         return $_SESSION[$key];
@@ -144,7 +144,7 @@ class Session implements SessionInterface
     private function sessionCanary()
     {
         $dateTime = new DateTime();
-        if (!array_key_exists('Canary', $_SESSION) || !array_key_exists('Expiry', $_SESSION)) {
+        if (!\array_key_exists('Canary', $_SESSION) || !\array_key_exists('Expiry', $_SESSION)) {
             $_SESSION = [];
             $this->regenerate(true);
             $_SESSION['Canary'] = $dateTime->format('Y-m-d H:i:s');
@@ -183,11 +183,11 @@ class Session implements SessionInterface
     private function sessionBinding($key)
     {
         if (null !== $this->sessionOptions[$key]) {
-            if (!array_key_exists($key, $_SESSION)) {
+            if (!\array_key_exists($key, $_SESSION)) {
                 $_SESSION[$key] = $this->sessionOptions[$key];
             }
             if ($this->sessionOptions[$key] !== $_SESSION[$key]) {
-                throw new SessionException(sprintf('session bound to %s, we got "%s", but expected "%s"', $key, $_SESSION[$key], $this->sessionOptions[$key]));
+                throw new SessionException(\sprintf('session bound to %s, we got "%s", but expected "%s"', $key, $_SESSION[$key], $this->sessionOptions[$key]));
             }
         }
     }
