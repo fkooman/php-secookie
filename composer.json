@@ -28,7 +28,7 @@
     },
     "support": {
         "email": "fkooman@tuxed.net",
-        "source": "https://git.tuxed.net/fkooman/secookie"
+        "source": "https://git.tuxed.net/fkooman/php-secookie"
     },
     "type": "library"
 }
