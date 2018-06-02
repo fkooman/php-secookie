@@ -1,6 +1,6 @@
 # ChangeLog
 
-## 2.0.1 (...)
+## 2.0.1 (2018-06-02)
 - add support for newer versions of PHPUnit
 - update (C)
 - update source formatting
