@@ -30,8 +30,10 @@ supported by all current, i.e. >= IE 11, browsers on desktop and mobile.
 
 Setting a cookie, i.e. add the `Set-Cookie` header is straightforward:
 
+```php
     $cookie = new Cookie();
     $cookie->set('foo', 'bar');
+```
 
 This will set the cookie using the `Secure`, `HttpOnly` and `SameSite=Strict` 
 values. 
@@ -48,6 +50,7 @@ The following configuration options are supported:
 For example, to limit a browser to only send the cookie to the `/foo/` path and
 use the `Lax` option for `SameSite`:
 
+```php
     $cookie = new Cookie(
         [
             'Path' => '/foo/',
@@ -55,19 +58,24 @@ use the `Lax` option for `SameSite`:
         ]
     );
     $cookie->set('foo', 'bar');
+```
 
 You can delete a cookie, which sets the value to the empty string and 
 `MaxAge=0`, this results in the browser deleting the cookie.
 
+```php
     $cookie->delete('foo');
+```
 
 # Sessions
 
 Sessions will use the same defaults as Cookies, so you'll get secure sessions
 out of the box. 
 
+```php
     $session = new Session();
     $session->set('foo', 'bar');
+```
 
 Note that the values here are stored _inside_ the session, and not sent to the
 browser!
@@ -86,11 +94,15 @@ accepted by PHP's `DateInterval` [class](https://secure.php.net/manual/en/class.
 You can destroy a session, i.e. empty the `$_SESSION` variable and regenerate 
 the session ID by calling the `destroy()` method:
 
+```php
     $session->destroy();
+```
 
 You can regenerate the session ID:
 
+```php
     $session->regenerate();
+```
 
 It accepts a boolean parameter to delete the session on the server.
  
@@ -103,6 +115,7 @@ information in the session, for example after user authentication.
 If you want to override the cookie settings, you can provide the a `Cookie` 
 instance as the second parameter to the `Session` constructor, e.g.:
 
+```php
     $session = new Session(
         [],
         new Cookie(
@@ -111,6 +124,7 @@ instance as the second parameter to the `Session` constructor, e.g.:
             ]
         )
     );
+```
 
 ## Session Binding
 
@@ -121,12 +135,14 @@ multiple domains, but shares the same PHP session storage.
 
 This can be used like this:
 
+```php
     $session = new Session(
         [
             'DomainBinding' => 'www.example.org',
             'PathBinding' => '/foo/',
         ]
     );
+```
 
 This does *not* restrict the `Domain` and `Path` options for the Cookie, to 
 modify these you'd have to provide your own `Cookie` instance as parameter to 
@@ -145,11 +161,13 @@ For some use cases it may be necessary to expire sessions on the server, this
 can be done with the `SessionExpiry` configuration option. The default is 8 
 hours.
 
+```php
     $session = new Session(
         [
             'SessionExpiry' => 'PT08H',
         ]
     );
+```
 
 To disable session expiry, you can set the `SessionExpiry` to `null`.
 
@@ -159,6 +177,7 @@ It is **very** important that you update your PHP session settings in
 `php.ini` on your host. See _The Fast Track to Safe and Secure PHP Sessions_, 
 linked below in the resources.
 
+```ini
     ;
     ; session
     ;
@@ -184,6 +203,7 @@ linked below in the resources.
     ; PHP >= 7.1
     ;session.sid_length = 52
     ;session.sid_bits_per_character = 5
+```
 
 # Contact
 
