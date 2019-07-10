@@ -45,7 +45,7 @@ class Cookie implements CookieInterface
                 'Path' => null,         // string
                 'Domain' => null,       // string
                 'Max-Age' => null,      // int > 0
-                'SameSite' => 'Strict', // "Strict|Lax"
+                'SameSite' => 'Strict', // null|'Strict'|'Lax'|'None'
             ],
             $cookieOptions
         );
