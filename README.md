@@ -45,7 +45,7 @@ The following configuration options are supported:
 * `Path`: `string`|`null` (default: `null`)
 * `Domain`: `string`|`null` (default: `null`)
 * `Max-Age`: `int`|`null` (default: `null`)
-* `SameSite`: `Strict`|`Lax`|`null` (default: `Strict`)
+* `SameSite`: `Strict`|`Lax`|`None`|`null` (default: `Strict`)
 
 For example, to limit a browser to only send the cookie to the `/foo/` path and
 use the `Lax` option for `SameSite`:
