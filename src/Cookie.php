@@ -32,10 +32,6 @@ class Cookie implements CookieInterface
     /** @var HeaderInterface */
     private $header;
 
-    /**
-     * @param array                $cookieOptions
-     * @param HeaderInterface|null $header
-     */
     public function __construct(array $cookieOptions = [], HeaderInterface $header = null)
     {
         $this->cookieOptions = \array_merge(

@@ -36,10 +36,6 @@ class Session implements SessionInterface
     /** @var Cookie */
     private $cookie;
 
-    /**
-     * @param array       $sessionOptions
-     * @param Cookie|null $cookie
-     */
     public function __construct(array $sessionOptions = [], Cookie $cookie = null)
     {
         $this->sessionOptions = \array_merge(
@@ -75,7 +71,9 @@ class Session implements SessionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Get the session ID.
+     *
+     * @return string
      */
     public function id()
     {
@@ -83,7 +81,11 @@ class Session implements SessionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Regenerate the session ID.
+     *
+     * @param bool $deleteOldSession
+     *
+     * @return void
      */
     public function regenerate($deleteOldSession = false)
     {
@@ -92,7 +94,12 @@ class Session implements SessionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Set session value.
+     *
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return void
      */
     public function set($key, $value)
     {
@@ -100,7 +107,11 @@ class Session implements SessionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Delete session key/value.
+     *
+     * @param string $key
+     *
+     * @return void
      */
     public function delete($key)
     {
@@ -110,7 +121,11 @@ class Session implements SessionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Test if session key exists.
+     *
+     * @param string $key
+     *
+     * @return bool
      */
     public function has($key)
     {
@@ -118,7 +133,11 @@ class Session implements SessionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Get session value.
+     *
+     * @param string $key
+     *
+     * @return mixed
      */
     public function get($key)
     {
@@ -130,7 +149,9 @@ class Session implements SessionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Empty the session.
+     *
+     * @return void
      */
     public function destroy()
     {

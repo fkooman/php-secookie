@@ -30,6 +30,8 @@ interface CookieInterface
      * Delete a cookie.
      *
      * @param string $name
+     *
+     * @return void
      */
     public function delete($name);
 
@@ -38,6 +40,8 @@ interface CookieInterface
      *
      * @param string $name
      * @param string $value
+     *
+     * @return void
      */
     public function set($name, $value);
 }
