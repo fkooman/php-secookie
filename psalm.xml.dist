@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
-<psalm totallyTyped="false" useDocblockTypes="true">
+<psalm totallyTyped="true" useDocblockTypes="true">
   <projectFiles>
     <directory name="src"/>
+    <directory name="tests"/>
     <ignoreFiles>
       <directory name="vendor"/>
     </ignoreFiles>

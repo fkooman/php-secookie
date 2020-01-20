@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2017, 2018 François Kooman <fkooman@tuxed.net>
+ * Copyright (c) 2017-2020 François Kooman <fkooman@tuxed.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,209 +24,249 @@
 
 namespace fkooman\SeCookie;
 
-use DateInterval;
 use DateTime;
 use fkooman\SeCookie\Exception\SessionException;
+use RuntimeException;
 
-class Session implements SessionInterface
+class Session
 {
-    /** @var array */
+    /** @var SessionStorageInterface */
+    protected $sessionStorage;
+
+    /** @var \DateTime */
+    protected $dateTime;
+
+    /** @var SessionOptions */
     private $sessionOptions;
 
     /** @var Cookie */
     private $cookie;
 
-    public function __construct(array $sessionOptions = [], Cookie $cookie = null)
-    {
-        $this->sessionOptions = \array_merge(
-            [
-                'SessionExpiry' => 'PT08H', // expire session (8 hours)
-                'CanaryExpiry' => 'PT01H',  // regenerate session ID (1 hour)
-                'DomainBinding' => null,    // also bind session to Domain
-                'PathBinding' => null,      // also bind session to Path
-                'SessionName' => null,      // override the default session name
-            ],
-            $sessionOptions
-        );
+    /** @var ActiveSession|null */
+    private $activeSession = null;
 
+    public function __construct(SessionOptions $sessionOptions = null, Cookie $cookie = null)
+    {
+        if (null === $sessionOptions) {
+            $sessionOptions = new SessionOptions();
+        }
+        $this->sessionOptions = $sessionOptions;
         if (null === $cookie) {
             $cookie = new Cookie();
         }
         $this->cookie = $cookie;
+        $this->sessionStorage = new SessionStorage();
+        $this->dateTime = new DateTime();
+    }
 
-        if (null !== $this->sessionOptions['SessionName']) {
-            \session_name($this->sessionOptions['SessionName']);
+    public function __destruct()
+    {
+        // stopping by destructor does not require there to be an active
+        // session, maybe it was never started...
+        if (null !== $activeSession = $this->activeSession) {
+            $this->sessionStorage->store($activeSession);
+            $this->activeSession = null;
         }
-
-        if (PHP_SESSION_ACTIVE !== \session_status()) {
-            \session_start();
-        }
-
-        $this->sessionCanary();
-        $this->domainBinding();
-        $this->pathBinding();
-        $this->sessionExpiry();
-
-        $this->cookie->replace(\session_name(), \session_id());
     }
 
     /**
-     * Get the session ID.
-     *
+     * @return void
+     */
+    public function start()
+    {
+        if (null !== $this->activeSession) {
+            throw new SessionException('session already active');
+        }
+
+        // we take the exact same values PHP 7.3 also provides (by default)
+        // after session_start()
+        $this->sendHeader('Cache-Control: no-store, no-cache, must-revalidate');
+        $this->sendHeader('Pragma: no-cache');
+
+        $sessionName = $this->sessionOptions->getName();
+        if (null === $sessionId = $this->cookie->get($sessionName)) {
+            // no session cookie received
+            $this->createSession();
+
+            return;
+        }
+
+        if (!self::isValidSessionId($sessionId)) {
+            // invalid session ID (syntax) provided
+            $this->createSession();
+
+            return;
+        }
+
+        if (null === $activeSession = $this->sessionStorage->retrieve($sessionId)) {
+            // no active session found
+            $this->createSession();
+
+            return;
+        }
+
+        if ($activeSession->isExpired($this->dateTime)) {
+            // session expired
+            $this->sessionStorage->destroy($activeSession->sessionId());
+            $this->createSession();
+
+            return;
+        }
+
+        // run the garbage collection (delete old session data files) on
+        // average once every 100 calls to Session::start()
+        if ($this->sessionOptions->getGc()) {
+            if (0 === \random_int(0, 99)) {
+                $this->sessionStorage->gc($this->sessionOptions->getExpiresIn());
+            }
+        }
+
+        // we have a valid session
+        $this->activeSession = $activeSession;
+    }
+
+    /**
+     * @return void
+     */
+    public function stop()
+    {
+        $activeSession = $this->requireActiveSession();
+        $this->sessionStorage->store($activeSession);
+        $this->activeSession = null;
+    }
+
+    /**
+     * @return void
+     */
+    public function regenerate()
+    {
+        $activeSession = $this->requireActiveSession();
+        $this->destroy();
+        // use current data for new session
+        $this->createSession($activeSession->sessionData());
+    }
+
+    /**
      * @return string
      */
     public function id()
     {
-        return \session_id();
+        $activeSession = $this->requireActiveSession();
+
+        return $activeSession->sessionId();
     }
 
     /**
-     * Regenerate the session ID.
-     *
-     * @param bool $deleteOldSession
-     *
-     * @return void
-     */
-    public function regenerate($deleteOldSession = false)
-    {
-        \session_regenerate_id($deleteOldSession);
-        $this->cookie->replace(\session_name(), \session_id());
-    }
-
-    /**
-     * Set session value.
-     *
-     * @param string $key
-     * @param mixed  $value
-     *
-     * @return void
-     */
-    public function set($key, $value)
-    {
-        $_SESSION[$key] = $value;
-    }
-
-    /**
-     * Delete session key/value.
-     *
-     * @param string $key
-     *
-     * @return void
-     */
-    public function delete($key)
-    {
-        if ($this->has($key)) {
-            unset($_SESSION[$key]);
-        }
-    }
-
-    /**
-     * Test if session key exists.
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function has($key)
-    {
-        return \array_key_exists($key, $_SESSION);
-    }
-
-    /**
-     * Get session value.
-     *
-     * @param string $key
-     *
-     * @return mixed
-     */
-    public function get($key)
-    {
-        if (!$this->has($key)) {
-            throw new SessionException(\sprintf('key "%s" not available in session', $key));
-        }
-
-        return $_SESSION[$key];
-    }
-
-    /**
-     * Empty the session.
-     *
      * @return void
      */
     public function destroy()
     {
-        $_SESSION = [];
-        $this->regenerate(true);
+        $activeSession = $this->requireActiveSession();
+        $this->sessionStorage->destroy($activeSession->sessionId());
+        $this->activeSession = null;
     }
 
     /**
-     * @return void
-     */
-    private function sessionCanary()
-    {
-        $dateTime = new DateTime();
-        if (!\array_key_exists('Canary', $_SESSION) || !\array_key_exists('Expiry', $_SESSION)) {
-            $_SESSION = [];
-            $this->regenerate(true);
-            $_SESSION['Canary'] = $dateTime->format('Y-m-d H:i:s');
-            $_SESSION['Expiry'] = $dateTime->format('Y-m-d H:i:s');
-        } else {
-            $canaryDateTime = new DateTime($_SESSION['Canary']);
-            $canaryDateTime->add(new DateInterval($this->sessionOptions['CanaryExpiry']));
-            if ($canaryDateTime < $dateTime) {
-                $this->regenerate(true);
-                $_SESSION['Canary'] = $dateTime->format('Y-m-d H:i:s');
-            }
-        }
-    }
-
-    /**
-     * @return void
-     */
-    private function domainBinding()
-    {
-        $this->sessionBinding('DomainBinding');
-    }
-
-    /**
-     * @return void
-     */
-    private function pathBinding()
-    {
-        $this->sessionBinding('PathBinding');
-    }
-
-    /**
-     * @param string $key
+     * @param string $sessionKey
+     * @param string $sessionValue
      *
      * @return void
      */
-    private function sessionBinding($key)
+    public function set($sessionKey, $sessionValue)
     {
-        if (null !== $this->sessionOptions[$key]) {
-            if (!\array_key_exists($key, $_SESSION)) {
-                $_SESSION[$key] = $this->sessionOptions[$key];
-            }
-            if ($this->sessionOptions[$key] !== $_SESSION[$key]) {
-                throw new SessionException(\sprintf('session bound to %s, we got "%s", but expected "%s"', $key, $_SESSION[$key], $this->sessionOptions[$key]));
-            }
-        }
+        $activeSession = $this->requireActiveSession();
+        $activeSession->set($sessionKey, $sessionValue);
     }
 
     /**
-     * Expire session after a specified time.
+     * @param string $sessionKey
+     *
+     * @return string|null
+     */
+    public function get($sessionKey)
+    {
+        $activeSession = $this->requireActiveSession();
+
+        return $activeSession->get($sessionKey);
+    }
+
+    /**
+     * @param string $sessionKey
      *
      * @return void
      */
-    private function sessionExpiry()
+    public function remove($sessionKey)
     {
-        $dateTime = new DateTime();
-        if (null !== $this->sessionOptions['SessionExpiry']) {
-            $expiryDateTime = new DateTime($_SESSION['Expiry']);
-            $expiryDateTime->add(new DateInterval($this->sessionOptions['SessionExpiry']));
-            if ($expiryDateTime < $dateTime) {
-                $this->destroy();
-            }
+        $activeSession = $this->requireActiveSession();
+        $activeSession->remove($sessionKey);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getRandomBytes()
+    {
+        return \random_bytes(32);
+    }
+
+    /**
+     * @param string $headerKeyValue
+     *
+     * @return void
+     */
+    protected function sendHeader($headerKeyValue)
+    {
+        // overwrite existing headers with same name
+        \header($headerKeyValue, true);
+    }
+
+    /**
+     * @return ActiveSession
+     */
+    private function requireActiveSession()
+    {
+        if (null === $activeSession = $this->activeSession) {
+            throw new SessionException('session not active');
         }
+
+        return $activeSession;
+    }
+
+    /**
+     * @return void
+     */
+    private function createSession(array $sessionData = [])
+    {
+        $sessionName = $this->sessionOptions->getName();
+        $sessionId = \bin2hex($this->getRandomBytes());
+        $activeSession = new ActiveSession($sessionId, $sessionData);
+        // override/set the expiry of the session
+        $activeSession->set('__expires_at', $this->calculateExpiresAt());
+        $this->sessionStorage->create($sessionId);
+        $this->activeSession = $activeSession;
+        $this->cookie->set($sessionName, $sessionId);
+    }
+
+    /**
+     * @param string $sessionId
+     *
+     * @return bool
+     */
+    private static function isValidSessionId($sessionId)
+    {
+        return 1 === \preg_match('/^[0-9a-f]{64}$/', $sessionId);
+    }
+
+    /**
+     * @return string
+     */
+    private function calculateExpiresAt()
+    {
+        $expiresIn = $this->sessionOptions->getExpiresIn();
+        if (false === $expiresAt = \date_add(clone $this->dateTime, $expiresIn)) {
+            throw new RuntimeException('unable to determine "expiresAt"');
+        }
+
+        return $expiresAt->format(DateTime::ATOM);
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2017, 2018 François Kooman <fkooman@tuxed.net>
+ * Copyright (c) 2017-2020 François Kooman <fkooman@tuxed.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,26 +22,57 @@
  * SOFTWARE.
  */
 
-namespace fkooman\SeCookie;
+namespace fkooman\SeCookie\Tests;
 
-interface CookieInterface
+use fkooman\SeCookie\Cookie;
+use fkooman\SeCookie\CookieOptions;
+
+class TestCookie extends Cookie
 {
-    /**
-     * Delete a cookie.
-     *
-     * @param string $name
-     *
-     * @return void
-     */
-    public function delete($name);
+    /** @var array<string> */
+    private $headersSent = [];
+
+    /** @var array<string> */
+    private $cookieData;
 
     /**
-     * Set a cookie.
-     *
-     * @param string $name
-     * @param string $value
+     * @param array<string,string> $cookieData
+     */
+    public function __construct(CookieOptions $cookieOptions, array $cookieData = [])
+    {
+        parent::__construct($cookieOptions);
+        $this->cookieData = $cookieData;
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function getHeadersSent()
+    {
+        return $this->headersSent;
+    }
+
+    /**
+     * @param string $headerKeyValue
      *
      * @return void
      */
-    public function set($name, $value);
+    protected function sendHeader($headerKeyValue)
+    {
+        $this->headersSent[] = $headerKeyValue;
+    }
+
+    /**
+     * @param string $cookieName
+     *
+     * @return string|null
+     */
+    protected function readCookie($cookieName)
+    {
+        if (!\array_key_exists($cookieName, $this->cookieData)) {
+            return null;
+        }
+
+        return $this->cookieData[$cookieName];
+    }
 }

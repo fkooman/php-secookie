@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 3.0.0 (...)
+- completely rewrite the library to use custom session handling without relying
+  on PHP's built-in session/cookie support
+
 ## 2.0.1 (2018-06-02)
 - add support for newer versions of PHPUnit
 - update (C)

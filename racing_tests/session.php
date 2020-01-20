@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2017, 2018 François Kooman <fkooman@tuxed.net>
+ * Copyright (c) 2017-2020 François Kooman <fkooman@tuxed.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,33 +22,37 @@
  * SOFTWARE.
  */
 
-namespace fkooman\SeCookie;
+require \dirname(__DIR__).'/vendor/autoload.php';
 
-interface HeaderInterface
-{
-    /**
-     * Remove all headers with this name.
-     *
-     * @param string $name
-     *
-     * @return void
-     */
-    public function remove($name);
+use fkooman\SeCookie\Session;
 
-    /**
-     * Set a header, optionally overwriting existing header with this name.
-     *
-     * @param string $header
-     * @param bool   $replace replace all existing headers with this name
-     *
-     * @return void
-     */
-    public function set($header, $replace = true);
+$session = new Session();
+$session->start();
 
-    /**
-     * Get a list of all headers set.
-     *
-     * @return array
-     */
-    public function ls();
+$a = \array_key_exists('a', $_GET) ? $_GET['a'] : '1';
+
+switch ($a) {
+    case '1':
+        $session->set('foo', 'bar');
+        echo $session->id();
+        break;
+    case '2':
+        \sleep(2);
+        $session->destroy();
+        break;
+    case '3':
+        echo $session->get('foo');
+        break;
+    case '4':
+        echo $session->id();
+        break;
+    case '5':
+        if (null === $counter = $session->get('counter')) {
+            $counter = 0;
+        }
+        $counter = (int) $counter;
+        ++$counter;
+        $session->set('counter', (string) $counter);
+        echo $counter;
+        break;
 }

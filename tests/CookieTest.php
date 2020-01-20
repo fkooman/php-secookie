@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2017, 2018 François Kooman <fkooman@tuxed.net>
+ * Copyright (c) 2017-2020 François Kooman <fkooman@tuxed.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 
 namespace fkooman\SeCookie\Tests;
 
-use fkooman\SeCookie\Cookie;
+use fkooman\SeCookie\CookieOptions;
 use PHPUnit\Framework\TestCase;
 
 class CookieTest extends TestCase
@@ -34,9 +34,10 @@ class CookieTest extends TestCase
      */
     public function testNoCookie()
     {
-        $t = new TestHeader();
-        $c = new Cookie([], $t);
-        $this->assertSame([], $t->ls());
+        $cookieOptions = new CookieOptions();
+        $testCookie = new TestCookie($cookieOptions, []);
+
+        $this->assertSame([], $testCookie->getHeadersSent());
     }
 
     /**
@@ -44,14 +45,14 @@ class CookieTest extends TestCase
      */
     public function testSimple()
     {
-        $t = new TestHeader();
-        $c = new Cookie([], $t);
-        $c->set('foo', 'bar');
+        $cookieOptions = new CookieOptions();
+        $testCookie = new TestCookie($cookieOptions, []);
+        $testCookie->set('foo', 'bar');
         $this->assertSame(
             [
-                'Set-Cookie: foo=bar; Secure; HttpOnly; SameSite=Strict',
+                'Set-Cookie: foo=bar; HttpOnly; SameSite=Lax; Secure',
             ],
-            $t->ls()
+            $testCookie->getHeadersSent()
         );
     }
 
@@ -60,14 +61,14 @@ class CookieTest extends TestCase
      */
     public function testDeleteCookie()
     {
-        $t = new TestHeader();
-        $c = new Cookie([], $t);
-        $c->delete('foo');
+        $cookieOptions = new CookieOptions();
+        $testCookie = new TestCookie($cookieOptions, []);
+        $testCookie->delete('foo');
         $this->assertSame(
             [
-                'Set-Cookie: foo=; Secure; HttpOnly; Max-Age=0; SameSite=Strict',
+                'Set-Cookie: foo=; HttpOnly; Max-Age=0; SameSite=Lax; Secure',
             ],
-            $t->ls()
+            $testCookie->getHeadersSent()
         );
     }
 
@@ -76,33 +77,15 @@ class CookieTest extends TestCase
      */
     public function testDeleteCookieWithMaxAge()
     {
-        $t = new TestHeader();
-        $c = new Cookie(['Max-Age' => 12345], $t);
-        $c->delete('foo');
+        $cookieOptions = new CookieOptions();
+        $cookieOptions->setMaxAge(12345);
+        $testCookie = new TestCookie($cookieOptions, []);
+        $testCookie->delete('foo');
         $this->assertSame(
             [
-                'Set-Cookie: foo=; Secure; HttpOnly; Max-Age=0; SameSite=Strict',
+                'Set-Cookie: foo=; HttpOnly; Max-Age=0; SameSite=Lax; Secure',
             ],
-            $t->ls()
-        );
-    }
-
-    /**
-     * @return void
-     */
-    public function testReplaceCookie()
-    {
-        $t = new TestHeader();
-        $c = new Cookie([], $t);
-        $c->set('foo', 'bar');
-        $c->set('bar', 'baz');
-        $c->replace('foo', '123');
-        $this->assertSame(
-            [
-                'Set-Cookie: bar=baz; Secure; HttpOnly; SameSite=Strict',
-                'Set-Cookie: foo=123; Secure; HttpOnly; SameSite=Strict',
-            ],
-            $t->ls()
+            $testCookie->getHeadersSent()
         );
     }
 
@@ -111,21 +94,36 @@ class CookieTest extends TestCase
      */
     public function testAttributeValues()
     {
-        $t = new TestHeader();
-        $c = new Cookie(
-            [
-                'Path' => '/foo/',
-                'Domain' => 'www.example.org',
-                'Max-Age' => 12345,
-            ],
-            $t
-        );
-        $c->set('foo', 'bar');
+        $cookieOptions = new CookieOptions();
+        $cookieOptions->setPath('/foo/');
+        $cookieOptions->setMaxAge(12345);
+        $testCookie = new TestCookie($cookieOptions, []);
+        $testCookie->set('foo', 'bar');
         $this->assertSame(
             [
-                'Set-Cookie: foo=bar; Secure; HttpOnly; Path=/foo/; Domain=www.example.org; Max-Age=12345; SameSite=Strict',
+                'Set-Cookie: foo=bar; HttpOnly; Max-Age=12345; Path=/foo/; SameSite=Lax; Secure',
             ],
-            $t->ls()
+            $testCookie->getHeadersSent()
         );
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetCookie()
+    {
+        $cookieOptions = new CookieOptions();
+        $testCookie = new TestCookie($cookieOptions, ['SID' => 'abcdef']);
+        $this->assertSame('abcdef', $testCookie->get('SID'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testMissingCookie()
+    {
+        $cookieOptions = new CookieOptions();
+        $testCookie = new TestCookie($cookieOptions, []);
+        $this->assertNull($testCookie->get('SID'));
     }
 }

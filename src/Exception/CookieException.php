@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2017, 2018 François Kooman <fkooman@tuxed.net>
+ * Copyright (c) 2017-2020 François Kooman <fkooman@tuxed.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,42 +22,10 @@
  * SOFTWARE.
  */
 
-namespace fkooman\SeCookie\Tests;
+namespace fkooman\SeCookie\Exception;
 
-use fkooman\SeCookie\HeaderInterface;
+use Exception;
 
-class TestHeader implements HeaderInterface
+class CookieException extends Exception
 {
-    /** @var array */
-    private $headerList = [];
-
-    /**
-     * @param mixed $name
-     *
-     * @return void
-     */
-    public function remove($name)
-    {
-        foreach ($this->headerList as $k => $v) {
-            if (0 === \stripos($v, \sprintf('%s: ', $name))) {
-                unset($this->headerList[$k]);
-            }
-        }
-    }
-
-    /**
-     * @param mixed $header
-     * @param mixed $override
-     *
-     * @return void
-     */
-    public function set($header, $override = false)
-    {
-        $this->headerList[] = $header;
-    }
-
-    public function ls()
-    {
-        return \array_values($this->headerList);
-    }
 }

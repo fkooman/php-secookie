@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2017, 2018 François Kooman <fkooman@tuxed.net>
+ * Copyright (c) 2017-2020 François Kooman <fkooman@tuxed.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,275 +24,292 @@
 
 namespace fkooman\SeCookie\Tests;
 
-use fkooman\SeCookie\Cookie;
-use fkooman\SeCookie\Session;
+use DateTime;
+use fkooman\SeCookie\CookieOptions;
+use fkooman\SeCookie\SessionOptions;
 use PHPUnit\Framework\TestCase;
 
 class SessionTest extends TestCase
 {
     /**
-     * @runInSeparateProcess
-     *
      * @return void
      */
-    public function testSimple()
+    public function testSessionStart()
     {
-        $t = new TestHeader();
-        $c = new Session([], new Cookie([], $t));
-        $c->set('foo', 'bar');
+        $testSessionStorage = new TestSessionStorage([]);
+        $testCookie = new TestCookie(new CookieOptions(), []);
+        $testSession = new TestSession(new SessionOptions(), $testCookie, $testSessionStorage, 0, new DateTime('2019-01-01T08:00:00+00:00'));
+
+        $testSession->start();
+        $testSession->stop();
         $this->assertSame(
             [
-                \sprintf('Set-Cookie: PHPSESSID=%s; Secure; HttpOnly; SameSite=Strict', $c->id()),
+                'Set-Cookie: SID=0000000000000000000000000000000000000000000000000000000000000000; HttpOnly; SameSite=Lax; Secure',
             ],
-            $t->ls()
+            $testCookie->getHeadersSent()
+        );
+        $this->assertSame(
+            [
+                'Cache-Control: no-store, no-cache, must-revalidate',
+                'Pragma: no-cache',
+            ],
+            $testSession->getHeadersSent()
+        );
+        $this->assertSame(
+            [
+                '0000000000000000000000000000000000000000000000000000000000000000' => [
+                    '__expires_at' => '2019-01-01T08:30:00+00:00',
+                ],
+            ],
+            $testSessionStorage->getAll()
         );
     }
 
     /**
-     * @runInSeparateProcess
-     *
      * @return void
      */
-    public function testSessionName()
+    public function testSetValue()
     {
-        $t = new TestHeader();
-        $c = new Session(['SessionName' => 'SID'], new Cookie([], $t));
-        $c->set('foo', 'bar');
+        $testSessionStorage = new TestSessionStorage([]);
+        $testCookie = new TestCookie(new CookieOptions(), []);
+        $testSession = new TestSession(new SessionOptions(), $testCookie, $testSessionStorage, 0, new DateTime('2019-01-01T08:00:00+00:00'));
+
+        $testSession->start();
+        $testSession->set('foo', 'bar');
+        $testSession->stop();
         $this->assertSame(
             [
-                \sprintf('Set-Cookie: SID=%s; Secure; HttpOnly; SameSite=Strict', $c->id()),
+                '0000000000000000000000000000000000000000000000000000000000000000' => [
+                    '__expires_at' => '2019-01-01T08:30:00+00:00',
+                   'foo' => 'bar',
+                ],
             ],
-            $t->ls()
+            $testSessionStorage->getAll()
+        );
+        $this->assertSame(
+            [
+                'Set-Cookie: SID=0000000000000000000000000000000000000000000000000000000000000000; HttpOnly; SameSite=Lax; Secure',
+            ],
+            $testCookie->getHeadersSent()
         );
     }
 
     /**
-     * @runInSeparateProcess
-     *
+     * @return void
+     */
+    public function testGetValue()
+    {
+        $testSessionStorage = new TestSessionStorage(
+            [
+                '0000000000000000000000000000000000000000000000000000000000000000' => [
+                    '__expires_at' => '2019-01-01T08:30:00+00:00',
+                    'foo' => 'bar',
+                ],
+            ]
+        );
+        $testCookie = new TestCookie(new CookieOptions(), ['SID' => '0000000000000000000000000000000000000000000000000000000000000000']);
+        $testSession = new TestSession(new SessionOptions(), $testCookie, $testSessionStorage, 0, new DateTime('2019-01-01T08:00:00+00:00'));
+
+        $testSession->start();
+        $this->assertSame('bar', $testSession->get('foo'));
+        // this is a continuation of a session, so we MUST NOT set a new session cookie
+        $this->assertSame([], $testCookie->getHeadersSent());
+    }
+
+    /**
+     * @return void
+     */
+    public function testUnsetValue()
+    {
+        $testSessionStorage = new TestSessionStorage(
+            [
+                '0000000000000000000000000000000000000000000000000000000000000000' => [
+                    '__expires_at' => '2019-01-01T08:30:00+00:00',
+                    'foo' => 'bar',
+                ],
+            ]
+        );
+        $testCookie = new TestCookie(new CookieOptions(), ['SID' => '0000000000000000000000000000000000000000000000000000000000000000']);
+        $testSession = new TestSession(new SessionOptions(), $testCookie, $testSessionStorage, 0, new DateTime('2019-01-01T08:00:00+00:00'));
+
+        $testSession->start();
+        $this->assertSame('bar', $testSession->get('foo'));
+        $testSession->remove('foo');
+        $testSession->stop();
+
+        $this->assertSame(
+            [
+                '0000000000000000000000000000000000000000000000000000000000000000' => [
+                    '__expires_at' => '2019-01-01T08:30:00+00:00',
+                ],
+            ],
+            $testSessionStorage->getAll()
+        );
+        $this->assertSame([], $testCookie->getHeadersSent());
+    }
+
+    /**
      * @return void
      */
     public function testRegenerate()
     {
-        $t = new TestHeader();
-        $c = new Session([], new Cookie([], $t));
-        $sessionId = $c->id();
+        $testSessionStorage = new TestSessionStorage(
+            [
+                '0000000000000000000000000000000000000000000000000000000000000000' => [
+                    '__expires_at' => '2019-01-01T08:30:00+00:00',
+                    'foo' => 'bar',
+                ],
+            ]
+        );
+        $testCookie = new TestCookie(new CookieOptions(), ['SID' => '0000000000000000000000000000000000000000000000000000000000000000']);
+        $testSession = new TestSession(new SessionOptions(), $testCookie, $testSessionStorage, 1, new DateTime('2019-01-01T08:15:00+00:00'));
+
+        $testSession->start();
+        $testSession->regenerate();
+        $testSession->stop();
+
+        // the "0000000000000000000000000000000000000000000000000000000000000000" session should be gone now
         $this->assertSame(
             [
-                \sprintf('Set-Cookie: PHPSESSID=%s; Secure; HttpOnly; SameSite=Strict', $sessionId),
+                '0101010101010101010101010101010101010101010101010101010101010101' => [
+                    // __expires_at is again 8 hours in the future from the
+                    // current time, as we set that to 10:00, will be 18:00
+                    '__expires_at' => '2019-01-01T08:45:00+00:00',
+                    'foo' => 'bar',
+                ],
             ],
-            $t->ls()
+            $testSessionStorage->getAll()
         );
-        $c->regenerate();
-        $sessionId = $c->id();
+
+        // we regenerated the session ID, so we expect a new session cookie
+        // we expect a new cookie to be sent
         $this->assertSame(
             [
-                \sprintf('Set-Cookie: PHPSESSID=%s; Secure; HttpOnly; SameSite=Strict', $sessionId),
+                'Set-Cookie: SID=0101010101010101010101010101010101010101010101010101010101010101; HttpOnly; SameSite=Lax; Secure',
             ],
-            $t->ls()
+            $testCookie->getHeadersSent()
         );
     }
 
     /**
-     * @runInSeparateProcess
-     * @expectedException        \fkooman\SeCookie\Exception\SessionException
-     * @expectedExceptionMessage session bound to DomainBinding, we got "www.example.org", but expected "www.example.com"
-     *
      * @return void
      */
-    public function testDomainBinding()
+    public function testNonExistingSession()
     {
-        $t = new TestHeader();
-        $c = new Session(
-            [
-                'DomainBinding' => 'www.example.org',
-            ],
-            new Cookie([], $t)
-        );
-        $c = new Session(
-            [
-                'DomainBinding' => 'www.example.com',
-            ],
-            new Cookie([], $t)
-        );
-    }
+        $testSessionStorage = new TestSessionStorage([]);
+        $testCookie = new TestCookie(new CookieOptions(), ['SID' => '0000000000000000000000000000000000000000000000000000000000000000']);
+        $testSession = new TestSession(new SessionOptions(), $testCookie, $testSessionStorage, 1, new DateTime('2019-01-01T08:00:00+00:00'));
 
-    /**
-     * @runInSeparateProcess
-     * @expectedException        \fkooman\SeCookie\Exception\SessionException
-     * @expectedExceptionMessage session bound to PathBinding, we got "/foo/", but expected "/bar/"
-     *
-     * @return void
-     */
-    public function testPathBinding()
-    {
-        $t = new TestHeader();
-        $c = new Session(
+        $testSession->start();
+        $testSession->stop();
+        // we expect a new cookie to be sent as the provided cookie does not have an active session
+        $this->assertSame(
             [
-                'PathBinding' => '/foo/',
+                'Set-Cookie: SID=0101010101010101010101010101010101010101010101010101010101010101; HttpOnly; SameSite=Lax; Secure',
             ],
-            new Cookie([], $t)
+            $testCookie->getHeadersSent()
         );
-        $c = new Session(
+        $this->assertSame(
             [
-                'PathBinding' => '/bar/',
+                '0101010101010101010101010101010101010101010101010101010101010101' => [
+                    '__expires_at' => '2019-01-01T08:30:00+00:00',
+                ],
             ],
-            new Cookie([], $t)
+            $testSessionStorage->getAll()
         );
     }
 
     /**
-     * @runInSeparateProcess
-     *
-     * @return void
-     */
-    public function testSetGet()
-    {
-        $t = new TestHeader();
-        $c = new Session([], new Cookie([], $t));
-        $c->set('foo', 'bar');
-        $this->assertSame('bar', $c->get('foo'));
-    }
-
-    /**
-     * @runInSeparateProcess
-     * @expectedException        \fkooman\SeCookie\Exception\SessionException
-     * @expectedExceptionMessage key "foo" not available in session
-     *
-     * @return void
-     */
-    public function testGetMissing()
-    {
-        $t = new TestHeader();
-        $c = new Session([], new Cookie([], $t));
-        $c->get('foo');
-    }
-
-    /**
-     * @runInSeparateProcess
-     *
-     * @return void
-     */
-    public function testDelete()
-    {
-        $t = new TestHeader();
-        $c = new Session([], new Cookie([], $t));
-        $c->set('foo', 'bar');
-        $this->assertTrue($c->has('foo'));
-        $c->delete('foo');
-        $this->assertFalse($c->has('foo'));
-    }
-
-    /**
-     * @runInSeparateProcess
-     *
-     * @return void
-     */
-    public function testDeleteMissing()
-    {
-        $t = new TestHeader();
-        $c = new Session([], new Cookie([], $t));
-        $this->assertFalse($c->has('foo'));
-        $c->delete('foo');
-        $this->assertFalse($c->has('foo'));
-    }
-
-    /**
-     * @runInSeparateProcess
-     *
-     * @return void
-     */
-    public function testExpiredCanary()
-    {
-        $t = new TestHeader();
-        $c = new Session(
-            [
-                'CanaryExpiry' => 'PT01S',
-            ],
-            new Cookie([], $t)
-        );
-        $c->set('foo', 'bar');
-        $firstId = $c->id();
-        \sleep(2);
-        $c = new Session(
-            [
-                'CanaryExpiry' => 'PT01S',
-            ],
-            new Cookie([], $t)
-        );
-        $secondId = $c->id();
-        $this->assertNotSame($firstId, $secondId);
-        $this->assertTrue($c->has('foo'));
-    }
-
-    /**
-     * @runInSeparateProcess
-     *
-     * @return void
-     */
-    public function testNotExpiredCanary()
-    {
-        $t = new TestHeader();
-        $c = new Session(
-            [
-                'CanaryExpiry' => 'PT01S',
-            ],
-            new Cookie([], $t)
-        );
-        $firstId = $c->id();
-        $c = new Session(
-            [
-                'CanaryExpiry' => 'PT01S',
-            ],
-            new Cookie([], $t)
-        );
-        $secondId = $c->id();
-        $this->assertSame($firstId, $secondId);
-    }
-
-    /**
-     * @runInSeparateProcess
-     *
      * @return void
      */
     public function testExpiredSession()
     {
-        $t = new TestHeader();
-        $c = new Session(
+        $testSessionStorage = new TestSessionStorage(
             [
-                'SessionExpiry' => 'PT01S',
-            ],
-            new Cookie([], $t)
+                '0000000000000000000000000000000000000000000000000000000000000000' => [
+                    '__expires_at' => '2019-01-01T08:30:00+00:00',
+                    'foo' => 'bar',
+                ],
+            ]
         );
-        $c->set('foo', 'bar');
-        $this->assertTrue($c->has('foo'));
-        \sleep(2);
-        $c = new Session(
+        $testCookie = new TestCookie(new CookieOptions(), ['SID' => '0000000000000000000000000000000000000000000000000000000000000000']);
+        // session should have been expired 15 minutes ago...
+        $testSession = new TestSession(new SessionOptions(), $testCookie, $testSessionStorage, 1, new DateTime('2019-01-01T08:45:00+00:00'));
+
+        $testSession->start();
+        $this->assertNull($testSession->get('foo'));
+        $testSession->stop();
+        $this->assertSame(
             [
-                'SessionExpiry' => 'PT01S',
+                'Set-Cookie: SID=0101010101010101010101010101010101010101010101010101010101010101; HttpOnly; SameSite=Lax; Secure',
             ],
-            new Cookie([], $t)
+            $testCookie->getHeadersSent()
         );
-        $this->assertFalse($c->has('foo'));
+        $this->assertSame(
+            [
+                '0101010101010101010101010101010101010101010101010101010101010101' => [
+                    '__expires_at' => '2019-01-01T09:15:00+00:00',
+                ],
+            ],
+            $testSessionStorage->getAll()
+        );
     }
 
     /**
-     * @runInSeparateProcess
-     *
      * @return void
      */
     public function testDestroy()
     {
-        $t = new TestHeader();
-        $c = new Session([], new Cookie([], $t));
-        $firstId = $c->id();
-        $c->destroy();
-        $secondId = $c->id();
-        $this->assertNotSame($firstId, $secondId);
-        $this->assertSame(
+        $testSessionStorage = new TestSessionStorage(
             [
-                \sprintf('Set-Cookie: PHPSESSID=%s; Secure; HttpOnly; SameSite=Strict', $secondId),
-            ],
-            $t->ls()
+                '0000000000000000000000000000000000000000000000000000000000000000' => [
+                    '__expires_at' => '2019-01-01T08:30:00+00:00',
+                    'foo' => 'bar',
+                ],
+            ]
         );
+        $testCookie = new TestCookie(new CookieOptions(), ['SID' => '0000000000000000000000000000000000000000000000000000000000000000']);
+        $testSession = new TestSession(new SessionOptions(), $testCookie, $testSessionStorage, 0, new DateTime('2019-01-01T08:00:00+00:00'));
+
+        $testSession->start();
+        $testSession->destroy();
+        $this->assertSame([], $testSessionStorage->getAll());
+    }
+
+    /**
+     * @return void
+     */
+    public function testMultipleSessions()
+    {
+        $testSessionStorage = new TestSessionStorage(
+            [
+                '0000000000000000000000000000000000000000000000000000000000000000' => [
+                    '__expires_at' => '2019-01-01T08:30:00+00:00',
+                    'foo' => 'bar',
+                ],
+                '0101010101010101010101010101010101010101010101010101010101010101' => [
+                    '__expires_at' => '2019-01-01T08:30:00+00:00',
+                    'foo' => 'baz',
+                ],
+            ]
+        );
+        $testCookie = new TestCookie(
+            new CookieOptions(),
+            [
+                'SID' => '0000000000000000000000000000000000000000000000000000000000000000',
+                'TID' => '0101010101010101010101010101010101010101010101010101010101010101',
+            ]
+        );
+        $testSessionOne = new TestSession(new SessionOptions(), $testCookie, $testSessionStorage, 0, new DateTime('2019-01-01T08:00:00+00:00'));
+        $testSessionTwo = new TestSession(SessionOptions::init()->setName('TID'), $testCookie, $testSessionStorage, 0, new DateTime('2019-01-01T08:00:00+00:00'));
+
+        $testSessionOne->start();
+        $this->assertSame('bar', $testSessionOne->get('foo'));
+
+        $testSessionTwo->start();
+        $this->assertSame('baz', $testSessionTwo->get('foo'));
+
+        // this is a continuation of a sessions, so we MUST NOT set a new session cookie
+        $this->assertSame([], $testCookie->getHeadersSent());
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2017, 2018 François Kooman <fkooman@tuxed.net>
+ * Copyright (c) 2017-2020 François Kooman <fkooman@tuxed.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,42 +22,54 @@
  * SOFTWARE.
  */
 
-namespace fkooman\SeCookie;
+namespace fkooman\SeCookie\Tests;
 
-class PhpHeader implements HeaderInterface
+use DateTime;
+use fkooman\SeCookie\Session;
+use fkooman\SeCookie\SessionOptions;
+
+class TestSession extends Session
 {
+    /** @var array<string> */
+    private $headersSent = [];
+
+    /** @var int */
+    private $randomCount = 0;
+
     /**
-     * Remove all headers with this name.
-     *
-     * @param string $name
-     *
-     * @return void
+     * @param int $randomStartIndex
      */
-    public function remove($name)
+    public function __construct(SessionOptions $sessionOptions, TestCookie $cookie, TestSessionStorage $sessionStorage, $randomStartIndex, DateTime $dateTime)
     {
-        \header_remove($name);
+        parent::__construct($sessionOptions, $cookie);
+        $this->randomCount = $randomStartIndex;
+        $this->sessionStorage = $sessionStorage;
+        $this->dateTime = $dateTime;
     }
 
     /**
-     * Set a header, optionally overwriting existing header with this name.
-     *
-     * @param string $header
-     * @param bool   $replace replace all existing headers with this name
-     *
-     * @return void
+     * @return array<string>
      */
-    public function set($header, $replace = true)
+    public function getHeadersSent()
     {
-        \header($header, $replace);
+        return $this->headersSent;
     }
 
     /**
-     * Get a list of all headers set.
-     *
-     * @return array
+     * @return string
      */
-    public function ls()
+    protected function getRandomBytes()
     {
-        return \headers_list();
+        return \str_repeat(\pack('C', $this->randomCount++), 32);
+    }
+
+    /**
+     * @param string $headerKeyValue
+     *
+     * @return void
+     */
+    protected function sendHeader($headerKeyValue)
+    {
+        $this->headersSent[] = $headerKeyValue;
     }
 }

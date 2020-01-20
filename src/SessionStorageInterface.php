@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2017, 2018 François Kooman <fkooman@tuxed.net>
+ * Copyright (c) 2017-2020 François Kooman <fkooman@tuxed.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,65 +24,38 @@
 
 namespace fkooman\SeCookie;
 
-interface SessionInterface
+use DateInterval;
+
+interface SessionStorageInterface
 {
     /**
-     * Get the session ID.
-     *
-     * @return string
-     */
-    public function id();
-
-    /**
-     * Regenerate the session ID.
-     *
-     * @param bool $deleteOldSession
+     * @param string $sessionId
      *
      * @return void
      */
-    public function regenerate($deleteOldSession = false);
+    public function create($sessionId);
 
     /**
-     * Set session value.
+     * @return void
+     */
+    public function store(ActiveSession $activeSession);
+
+    /**
+     * @param string $sessionId
      *
-     * @param string $key
-     * @param mixed  $value
+     * @return ActiveSession|null
+     */
+    public function retrieve($sessionId);
+
+    /**
+     * @param string $sessionId
      *
      * @return void
      */
-    public function set($key, $value);
+    public function destroy($sessionId);
 
     /**
-     * Delete session key/value.
-     *
-     * @param string $key
-     *
      * @return void
      */
-    public function delete($key);
-
-    /**
-     * Test if session key exists.
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function has($key);
-
-    /**
-     * Get session value.
-     *
-     * @param string $key
-     *
-     * @return mixed
-     */
-    public function get($key);
-
-    /**
-     * Empty the session.
-     *
-     * @return void
-     */
-    public function destroy();
+    public function gc(DateInterval $expiresIn);
 }

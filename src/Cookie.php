@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2017, 2018 François Kooman <fkooman@tuxed.net>
+ * Copyright (c) 2017-2020 François Kooman <fkooman@tuxed.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,126 +24,84 @@
 
 namespace fkooman\SeCookie;
 
-class Cookie implements CookieInterface
+class Cookie
 {
-    /** @var array */
+    /** @var CookieOptions */
     private $cookieOptions;
 
-    /** @var HeaderInterface */
-    private $header;
-
-    public function __construct(array $cookieOptions = [], HeaderInterface $header = null)
+    public function __construct(CookieOptions $cookieOptions = null)
     {
-        $this->cookieOptions = \array_merge(
-            [
-                'Secure' => true,       // bool
-                'HttpOnly' => true,     // bool
-                'Path' => null,         // string
-                'Domain' => null,       // string
-                'Max-Age' => null,      // int > 0
-                'SameSite' => 'Strict', // null|'Strict'|'Lax'|'None'
-            ],
-            $cookieOptions
-        );
-        if (null === $header) {
-            $header = new PhpHeader();
+        if (null === $cookieOptions) {
+            $cookieOptions = new CookieOptions();
         }
-        $this->header = $header;
+        $this->cookieOptions = $cookieOptions;
     }
 
     /**
-     * Delete a cookie.
-     *
-     * @param string $name
+     * @param string $cookieName
      *
      * @return void
      */
-    public function delete($name)
+    public function delete($cookieName)
     {
-        $this->set($name, '', true);
+        $this->set($cookieName, '');
     }
 
     /**
-     * Set a cookie value.
-     *
-     * @param string $name         the cookie name
-     * @param string $value        the cookie value
-     * @param bool   $deleteCookie tell browser to delete the cookie
+     * @param string $cookieName
+     * @param string $cookieValue
      *
      * @return void
      */
-    public function set($name, $value, $deleteCookie = false)
+    public function set($cookieName, $cookieValue)
     {
-        $attributeValueList = [];
-
-        if ($this->cookieOptions['Secure']) {
-            $attributeValueList[] = 'Secure';
-        }
-        if ($this->cookieOptions['HttpOnly']) {
-            $attributeValueList[] = 'HttpOnly';
-        }
-
-        if (null !== $this->cookieOptions['Path']) {
-            $attributeValueList[] = \sprintf('Path=%s', $this->cookieOptions['Path']);
-        }
-        if (null !== $this->cookieOptions['Domain']) {
-            $attributeValueList[] = \sprintf('Domain=%s', $this->cookieOptions['Domain']);
-        }
-
-        if (null !== $this->cookieOptions['Max-Age'] && !$deleteCookie) {
-            $attributeValueList[] = \sprintf('Max-Age=%d', $this->cookieOptions['Max-Age']);
-        }
-
-        if ($deleteCookie) {
-            // Max-Age=0 is a special value indicating to the browser that the
-            // cookie has to be deleted...
-            $attributeValueList[] = 'Max-Age=0';
-        }
-
-        if (null !== $this->cookieOptions['SameSite']) {
-            $attributeValueList[] = \sprintf('SameSite=%s', $this->cookieOptions['SameSite']);
-        }
-
-        $this->header->set(
+        $this->sendHeader(
             \sprintf(
                 'Set-Cookie: %s=%s; %s',
-                $name,
-                $value,
-                \implode('; ', $attributeValueList)
-            ),
-            false // do not replace
+                $cookieName,
+                $cookieValue,
+                \implode('; ', $this->cookieOptions->attributeValueList('' === $cookieValue))
+            )
         );
     }
 
     /**
-     * Replace an existing cookie.
+     * @param string $cookieName
      *
-     * @param string $name  the cookie name
-     * @param string $value the cookie value
+     * @return string|null
+     */
+    public function get($cookieName)
+    {
+        return $this->readCookie($cookieName);
+    }
+
+    /**
+     * @param string $headerKeyValue
      *
      * @return void
      */
-    public function replace($name, $value)
+    protected function sendHeader($headerKeyValue)
     {
-        $cookieList = [];
-        foreach ($this->header->ls() as $hdr) {
-            if (0 === \stripos($hdr, 'Set-Cookie: ')) {
-                // found "Set-Cookie"
-                if (0 !== \stripos($hdr, \sprintf('Set-Cookie: %s=', $name))) {
-                    // not the one we want to replace, add to backup list
-                    $cookieList[] = $hdr;
-                }
-            }
-        }
-        // remove all "Set-Cookie" headers, `header_remove()` is case
-        // insensitive
-        $this->header->remove('Set-Cookie');
+        // keep existing headers with same name
+        \header($headerKeyValue, false);
+    }
 
-        // restore cookies we want to keep
-        foreach ($cookieList as $cookie) {
-            $this->header->set($cookie, false);
+    /**
+     * @param string $cookieName
+     *
+     * @return string|null
+     */
+    protected function readCookie($cookieName)
+    {
+        if (!\array_key_exists($cookieName, $_COOKIE)) {
+            return null;
+        }
+        /** @var string|array<string> */
+        $cookieValue = $_COOKIE[$cookieName];
+        if (!\is_string($cookieValue)) {
+            return null;
         }
 
-        $this->set($name, $value);
+        return $cookieValue;
     }
 }
