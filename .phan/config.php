@@ -34,7 +34,6 @@ use Phan\Issue;
  * '-d' flag.
  */
 return [
-
     // Supported values: `'5.6'`, `'7.0'`, `'7.1'`, `'7.2'`, `'7.3'`, `'7.4'`, `null`.
     // If this is set to `null`,
     // then Phan assumes the PHP version which is closest to the minor version
@@ -368,6 +367,7 @@ return [
     'directory_list' => [
         'src',
         'tests',
+        'example',
         'vendor/phpunit/phpunit/src',
     ],
 
