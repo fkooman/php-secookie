@@ -102,14 +102,14 @@ object to the `Session` constructor:
 
     $ vendor/bin/phpunit
 
-## Session Locking / Race Conditions
+## Additional Tests
 
-One thing we cannot really test from PHPUnit is session locking / racing 
-conditions. 
+One thing we cannot properly test from PHPUnit is session locking and racing 
+conditions or deadlocks as they would require multiple "parallel" requests.
 
-So for that purpose we start multiple PHP web servers and run curl against it.
-Check the `racing_tests` directory for `run.sh` that you can run. It should 
-only print `OK`. See the `run.sh` file for more information.
+For that purpose we start multiple PHP web servers and run `curl` against it. 
+Check the `additional_tests` directory. Run `run_tests.sh` from there. If all 
+goes well the test prints `OK` at the end.
 
 # License
 

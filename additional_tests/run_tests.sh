@@ -24,18 +24,18 @@ stop_php() {
 ##########
 
 # obtain the SID
-SID=$(curl -s "http://localhost:8080/session.php?a=1")
+SID=$(curl -s "http://localhost:8080/session_test.php?a=1")
 
 # call "a=2" which will destroy the session but not before waiting 2 seconds 
 # which will give the next curl command the possibility to run in the lock and
 # block there for another ~ 1 second
-curl -s -H "Cookie: SID=${SID}" "http://localhost:8081/session.php?a=2" &
+curl -s -H "Cookie: SID=${SID}" "http://localhost:8081/session_test.php?a=2" &
 
 # wait 1 second before launching "a=3"...
 sleep 1
 
 # ...which will try to get the value from the session...
-S3=$(curl -s -H "Cookie: SID=${SID}" "http://localhost:8082/session.php?a=3")
+S3=$(curl -s -H "Cookie: SID=${SID}" "http://localhost:8082/session_test.php?a=3")
 
 # "a=3" should only read the session data *after* "a=2" is finished and thus 
 # the session was destroyed
@@ -51,14 +51,14 @@ fi
 ##########
 
 # obtain the SID
-SID=$(curl -s "http://localhost:8080/session.php?a=4")
+SID=$(curl -s "http://localhost:8080/session_test.php?a=4")
 
 i=0
 while [ $i -le 50 ]
 do
     PORT=$(( i % 3))
     (
-        curl -s -H "Cookie: SID=${SID}" "http://localhost:808${PORT}/session.php?a=5" >/dev/null
+        curl -s -H "Cookie: SID=${SID}" "http://localhost:808${PORT}/session_test.php?a=5" >/dev/null
     ) &
     i=$(( i + 1 ))
 done
@@ -66,7 +66,7 @@ done
 # we have to wait sufficiently long for all above curl commands to finish...
 sleep 3
 
-S5=$(curl -s -H "Cookie: SID=${SID}" "http://localhost:8080/session.php?a=5")
+S5=$(curl -s -H "Cookie: SID=${SID}" "http://localhost:8080/session_test.php?a=5")
 if [ "52" != "${S5}" ]
 then
     echo "ERROR: expected \"52\", got \"${S5}\""
