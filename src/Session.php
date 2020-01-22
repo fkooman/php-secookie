@@ -147,13 +147,11 @@ class Session
     }
 
     /**
-     * @return string
+     * @return bool
      */
-    public function id()
+    public function isActive()
     {
-        $activeSession = $this->requireActiveSession();
-
-        return $activeSession->sessionId();
+        return null !== $this->activeSession;
     }
 
     /**

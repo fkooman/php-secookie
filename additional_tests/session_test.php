@@ -34,7 +34,6 @@ $a = \array_key_exists('a', $_GET) ? $_GET['a'] : '1';
 switch ($a) {
     case '1':
         $session->set('foo', 'bar');
-        echo $session->id();
         break;
     case '2':
         \sleep(2);
@@ -44,7 +43,7 @@ switch ($a) {
         echo $session->get('foo');
         break;
     case '4':
-        echo $session->id();
+        // NOP
         break;
     case '5':
         if (null === $counter = $session->get('counter')) {
