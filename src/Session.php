@@ -147,14 +147,6 @@ class Session
     }
 
     /**
-     * @return bool
-     */
-    public function isActive()
-    {
-        return null !== $this->activeSession;
-    }
-
-    /**
      * @return void
      */
     public function destroy()
