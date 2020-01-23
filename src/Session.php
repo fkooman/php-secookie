@@ -36,25 +36,25 @@ class Session
     /** @var \DateTime */
     protected $dateTime;
 
+    /** @var Cookie */
+    protected $cookie;
+
     /** @var SessionOptions */
     private $sessionOptions;
-
-    /** @var Cookie */
-    private $cookie;
 
     /** @var ActiveSession|null */
     private $activeSession = null;
 
-    public function __construct(SessionOptions $sessionOptions = null, Cookie $cookie = null)
+    public function __construct(SessionOptions $sessionOptions = null, CookieOptions $cookieOptions = null)
     {
         if (null === $sessionOptions) {
             $sessionOptions = new SessionOptions();
         }
         $this->sessionOptions = $sessionOptions;
-        if (null === $cookie) {
-            $cookie = new Cookie();
+        if (null === $cookieOptions) {
+            $cookieOptions = new CookieOptions();
         }
-        $this->cookie = $cookie;
+        $this->cookie = new Cookie($cookieOptions);
         $this->sessionStorage = new SessionStorage();
         $this->dateTime = new DateTime();
     }

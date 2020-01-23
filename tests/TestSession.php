@@ -41,7 +41,8 @@ class TestSession extends Session
      */
     public function __construct(SessionOptions $sessionOptions, TestCookie $cookie, TestSessionStorage $sessionStorage, $randomStartIndex, DateTime $dateTime)
     {
-        parent::__construct($sessionOptions, $cookie);
+        parent::__construct($sessionOptions);
+        $this->cookie = $cookie;
         $this->randomCount = $randomStartIndex;
         $this->sessionStorage = $sessionStorage;
         $this->dateTime = $dateTime;
