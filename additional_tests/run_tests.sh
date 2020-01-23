@@ -25,7 +25,6 @@ stop_php() {
 
 # obtain the SID from the cookie header
 SID=$(curl -s -I "http://localhost:8080/session_test.php?a=1" | grep "Set-Cookie" | cut -d ':' -f 2 | cut -d ';' -f 1 | cut -d '=' -f 2)
-echo ${SID}
 
 # call "a=2" which will destroy the session but not before waiting 2 seconds 
 # which will give the next curl command the possibility to run in the lock and

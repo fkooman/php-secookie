@@ -75,7 +75,8 @@ class Session
     public function start()
     {
         if (null !== $this->activeSession) {
-            throw new SessionException('session already active');
+            // if session is already active, do nothing
+            return;
         }
 
         // we take the exact same values PHP 7.3 also provides (by default)
