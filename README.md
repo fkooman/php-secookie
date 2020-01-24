@@ -82,14 +82,13 @@ Start a new session, store a key `foo` with value `bar`:
     // ...
 
 If you want to modify the session cookie options, you can also provide a 
-`CookieOptions` object to the `SessionOptions` constructor or `init()` method:
+`CookieOptions` object to the `Session` constructor:
 
     <?php
 
     $mySession = new fkooman\SeCookie\Session(
-        fkooman\SeCookie\SessionOptions::init(
-			CookieOptions::init()->setSameSite('Strict')
-		)->setName('APP_SESSION');
+        fkooman\SeCookie\SessionOptions::init()->setName('APP_SESSION'),
+        fkooman\SeCookie\CookieOptions::init()->setSameSite('Strict')
     );
     $mySession->start();
 
