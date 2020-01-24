@@ -40,24 +40,17 @@ class SessionOptions
     /** @var bool */
     private $garbageCollection = true;
 
-    /** @var CookieOptions */
-    private $cookieOptions;
-
-    public function __construct(CookieOptions $cookieOptions = null)
+    public function __construct()
     {
-        if (null === $cookieOptions) {
-            $cookieOptions = new CookieOptions();
-        }
-        $this->cookieOptions = $cookieOptions;
         $this->expiresIn = new DateInterval(self::SESSION_EXPIRY_DEFAULT);
     }
 
     /**
      * @return self
      */
-    public static function init(CookieOptions $cookieOptions = null)
+    public static function init()
     {
-        return new self($cookieOptions);
+        return new self();
     }
 
     /**
@@ -112,13 +105,5 @@ class SessionOptions
     public function getGc()
     {
         return $this->garbageCollection;
-    }
-
-    /**
-     * @return CookieOptions
-     */
-    public function getCookieOptions()
-    {
-        return $this->cookieOptions;
     }
 }
