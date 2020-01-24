@@ -31,7 +31,7 @@ is rather scary material to read. Please read it if your application uses
 sessions! If you prefer to go "the PHP way", please read 
 [this](https://paragonie.com/blog/2015/04/fast-track-safe-and-secure-php-sessions).
 
-# How
+# API
 
 ## Cookies
 
