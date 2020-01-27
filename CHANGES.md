@@ -1,6 +1,6 @@
 # ChangeLog
 
-## 3.0.0 (...)
+## 3.0.0 (2020-01-27)
 - completely rewrite the library to use custom session handling without relying
   on PHP's built-in session and cookie support
 
