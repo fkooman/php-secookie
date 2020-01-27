@@ -26,7 +26,6 @@ namespace fkooman\SeCookie;
 
 use DateTime;
 use fkooman\SeCookie\Exception\SessionException;
-use RuntimeException;
 
 class Session
 {
@@ -253,10 +252,8 @@ class Session
      */
     private function calculateExpiresAt()
     {
-        $expiresIn = $this->sessionOptions->getExpiresIn();
-        if (false === $expiresAt = \date_add(clone $this->dateTime, $expiresIn)) {
-            throw new RuntimeException('unable to determine "expiresAt"');
-        }
+        $expiresAt = clone $this->dateTime;
+        $expiresAt->add($this->sessionOptions->getExpiresIn());
 
         return $expiresAt->format(DateTime::ATOM);
     }

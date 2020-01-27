@@ -27,7 +27,6 @@ namespace fkooman\SeCookie;
 use DateInterval;
 use DateTime;
 use fkooman\SeCookie\Exception\SessionException;
-use RuntimeException;
 
 class SessionStorage implements SessionStorageInterface
 {
@@ -142,9 +141,8 @@ class SessionStorage implements SessionStorageInterface
     {
         // loop over all session files and delete the session files that
         // haven't been modified for the amount of time specified in expiresIn
-        if (false === $expiresAt = \date_sub(clone $this->dateTime, $expiresIn)) {
-            throw new RuntimeException('unable to determine "expiresAt"');
-        }
+        $expiresAt = clone $this->dateTime;
+        $expiresAt->sub($expiresIn);
         $sessionFileFilter = \sprintf('%s/%s*', $this->sessionDir, self::SESSION_FILE_PREFIX);
         foreach (\glob($sessionFileFilter) as $sessionFile) {
             $lastModified = \filemtime($sessionFile);
