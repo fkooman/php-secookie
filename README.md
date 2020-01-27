@@ -40,7 +40,11 @@ Create a cookie `foo` with the value `bar`:
     <?php
 
     $myCookie = new fkooman\SeCookie\Cookie();
-    $myCookie->set('foo', 'bar');
+
+    if(null === $cookieValue = $myCookie->get('foo')) {
+        // no value for cookie "foo" (yet)
+        $myCookie->set('foo', 'bar');
+    }
 
 In order to modify cookie options, the `CookieOptions` class can be used:
 
@@ -52,7 +56,9 @@ In order to modify cookie options, the `CookieOptions` class can be used:
     $myCookie->set('foo', 'bar');
 
 The methods `setSecure(bool)`, `setPath(string)`, `setMaxAge(int)` and 
-`setSameSite(string|null)` are available for `CookieOptions`.
+`setSameSite(string|null)` are available for `CookieOptions`. The values for
+`setSameSite` can be `Lax`, `Strict`, `None` or `null` where `null` means 
+not having `SameSite` as part of the cookie flags.
 
 ## Sessions
 
@@ -73,6 +79,10 @@ Start a new session, store a key `foo` with value `bar`:
 
     // ...
 
+    $mySession->remove('foo');
+    
+    // ...
+
     $mySession->regenerate();
 
     // ...
@@ -81,18 +91,30 @@ Start a new session, store a key `foo` with value `bar`:
 
     // ...
 
+The `Session::set` only takes `string` as a second parameter. You MUST convert 
+everything you want to store in your sessions to `string`, e.g. using PHP's 
+built-in `serialize()` function.
+
 If you want to modify the session cookie options, you can also provide a 
 `CookieOptions` object to the `Session` constructor:
 
     <?php
 
     $mySession = new fkooman\SeCookie\Session(
-        fkooman\SeCookie\SessionOptions::init()->setName('APP_SESSION'),
+        // default SessionOptions
+        fkooman\SeCookie\SessionOptions::init()
+            ->setName('SID')
+            ->setExpiresIn(new DateInterval('PT30M')),
         fkooman\SeCookie\CookieOptions::init()->setSameSite('Strict')
     );
+
     $mySession->start();
 
     // ...
+
+By default, session "garbage collection" is enabled, and run every 100th 
+request. It will delete session cookies that expired according to the 
+`SessionOptions::setExpiresIn()` value.
 
 # Testing
 
