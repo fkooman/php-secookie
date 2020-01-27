@@ -90,13 +90,11 @@ class SessionOptions
     }
 
     /**
-     * @param bool $garbageCollection
-     *
      * @return void
      */
-    public function setGc($garbageCollection)
+    public function disableGc()
     {
-        $this->garbageCollection = $garbageCollection;
+        $this->garbageCollection = false;
     }
 
     /**
