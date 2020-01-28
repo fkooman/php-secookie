@@ -368,6 +368,7 @@ return [
         'src',
         'tests',
         'example',
+        'vendor/paragonie/constant_time_encoding/src',
         'vendor/phpunit/phpunit/src',
     ],
 
