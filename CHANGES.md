@@ -1,6 +1,6 @@
 # ChangeLog
 
-## 3.0.1 (...)
+## 3.0.1 (2020-01-29)
 - use `Hex::encode()` from `paragonie/constant_time_encoding` for constant time
   hex encoding of session cookies
 
