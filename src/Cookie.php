@@ -67,8 +67,18 @@ class Cookie
             )
         );
 
-        // for older browsers we MUST set the cookie with both
-        // SameSite=None and without SameSite attribute
+        // after chrome moves to SameSite=Lax by default, we have to explicitly
+        // specify SameSite=None if we do NOT want Lax behavior. However, this
+        // breaks some old(er) browsers as they interprete SameSite=None as
+        // SameSite=Strict. For those we have to send a version without any
+        // SameSite attribute.
+        //
+        // The approach that does *not* involve browser user agent sniffing
+        // requires sending two cookies, one with SameSite=None and one without
+        // any SameSite attribute...
+        //
+        // @see https://www.chromium.org/updates/same-site
+        // @see https://web.dev/samesite-cookie-recipes/#handling-incompatible-clients
         if ('None' === $this->cookieOptions->getSameSite()) {
             $cookieOptions = clone $this->cookieOptions;
             $cookieOptions->setSameSite(null);
