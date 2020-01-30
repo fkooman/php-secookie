@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 3.1.0 (...)
+- when `CookieOptions::setSameSite('None')` is used, the same cookie is also 
+  sent without `SameSite` attribute for old(er) browsers
+
 ## 3.0.1 (2020-01-29)
 - use `Hex::encode()` from `paragonie/constant_time_encoding` for constant time
   hex encoding of session cookies
