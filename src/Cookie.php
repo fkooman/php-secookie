@@ -102,7 +102,13 @@ class Cookie
     public function get($cookieName)
     {
         if (null === $cookieValue = $this->readCookie($cookieName)) {
-            return $this->readCookie($cookieName.self::NO_SAME_SITE_POSTFIX);
+            // check the cookie with the NO_SAME_SITE_POSTFIX *only* if the
+            // current CookieOptions include SameSite=None
+            if ('None' === $this->cookieOptions->getSameSite()) {
+                return $this->readCookie($cookieName.self::NO_SAME_SITE_POSTFIX);
+            }
+
+            return null;
         }
 
         return $cookieValue;
