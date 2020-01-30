@@ -105,6 +105,14 @@ class CookieOptions
     }
 
     /**
+     * @return string|null
+     */
+    public function getSameSite()
+    {
+        return $this->sameSite;
+    }
+
+    /**
      * @param bool $deleteCookie
      *
      * @return array<string>

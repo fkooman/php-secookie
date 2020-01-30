@@ -26,6 +26,9 @@ namespace fkooman\SeCookie;
 
 class Cookie
 {
+    /** @var string */
+    const NO_SAME_SITE_POSTFIX = '_NOSS';
+
     /** @var CookieOptions */
     private $cookieOptions;
 
@@ -63,6 +66,22 @@ class Cookie
                 \implode('; ', $this->cookieOptions->attributeValueList('' === $cookieValue))
             )
         );
+
+        // for older browsers we MUST set the cookie with both
+        // SameSite=None and without SameSite attribute
+        if ('None' === $this->cookieOptions->getSameSite()) {
+            $cookieOptions = clone $this->cookieOptions;
+            $cookieOptions->setSameSite(null);
+            $this->sendHeader(
+                \sprintf(
+                    'Set-Cookie: %s%s=%s; %s',
+                    $cookieName,
+                    self::NO_SAME_SITE_POSTFIX,
+                    $cookieValue,
+                    \implode('; ', $cookieOptions->attributeValueList('' === $cookieValue))
+                )
+            );
+        }
     }
 
     /**
@@ -72,7 +91,11 @@ class Cookie
      */
     public function get($cookieName)
     {
-        return $this->readCookie($cookieName);
+        if (null === $cookieValue = $this->readCookie($cookieName)) {
+            return $this->readCookie($cookieName.self::NO_SAME_SITE_POSTFIX);
+        }
+
+        return $cookieValue;
     }
 
     /**

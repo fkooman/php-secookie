@@ -24,6 +24,7 @@
 
 namespace fkooman\SeCookie\Tests;
 
+use fkooman\SeCookie\Cookie;
 use fkooman\SeCookie\CookieOptions;
 use PHPUnit\Framework\TestCase;
 
@@ -125,5 +126,35 @@ class CookieTest extends TestCase
         $cookieOptions = new CookieOptions();
         $testCookie = new TestCookie($cookieOptions, []);
         $this->assertNull($testCookie->get('SID'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testSetSameSiteNoneCookie()
+    {
+        $cookieOptions = CookieOptions::init()->setSameSite('None');
+        $testCookie = new TestCookie($cookieOptions, []);
+        $testCookie->set('foo', 'bar');
+        $this->assertSame(
+            [
+                'Set-Cookie: foo=bar; HttpOnly; SameSite=None; Secure',
+                'Set-Cookie: foo'.Cookie::NO_SAME_SITE_POSTFIX.'=bar; HttpOnly; Secure',
+            ],
+            $testCookie->getHeadersSent()
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetSameSiteNoneCookie()
+    {
+        $cookieOptions = CookieOptions::init()->setSameSite('None');
+        // "foo" cookie should take precedence
+        $testCookie = new TestCookie($cookieOptions, ['foo'.Cookie::NO_SAME_SITE_POSTFIX => 'bar', 'foo' => 'baz']);
+        $this->assertSame('baz', $testCookie->get('foo'));
+        $testCookie = new TestCookie($cookieOptions, ['foo'.Cookie::NO_SAME_SITE_POSTFIX => 'bar']);
+        $this->assertSame('bar', $testCookie->get('foo'));
     }
 }
