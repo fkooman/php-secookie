@@ -49,14 +49,14 @@ class CookieOptions
     }
 
     /**
-     * @param bool $secure
+     * Disable the "Secure" option. Use the *ONLY* for development.
      *
      * @return self
      */
-    public function withSecure($secure)
+    public function withoutSecure()
     {
         $objCopy = clone $this;
-        $objCopy->secure = $secure;
+        $objCopy->secure = false;
 
         return $objCopy;
     }
@@ -92,18 +92,34 @@ class CookieOptions
     }
 
     /**
-     * @param string $sameSite
-     *
      * @return self
      */
-    public function withSameSite($sameSite)
+    public function withSameSiteNone()
     {
-        if (!\in_array($sameSite, ['Strict', 'Lax', 'None'], true)) {
-            throw new CookieException(\sprintf('"%s" is not a supported value of "SameSite"', $sameSite));
-        }
-
         $objCopy = clone $this;
-        $objCopy->sameSite = $sameSite;
+        $objCopy->sameSite = 'None';
+
+        return $objCopy;
+    }
+
+    /**
+     * @return self
+     */
+    public function withSameSiteLax()
+    {
+        $objCopy = clone $this;
+        $objCopy->sameSite = 'Lax';
+
+        return $objCopy;
+    }
+
+    /**
+     * @return self
+     */
+    public function withSameSiteStrict()
+    {
+        $objCopy = clone $this;
+        $objCopy->sameSite = 'Strict';
 
         return $objCopy;
     }

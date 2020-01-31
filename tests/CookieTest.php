@@ -130,7 +130,7 @@ class CookieTest extends TestCase
      */
     public function testSetSameSiteNoneCookie()
     {
-        $cookieOptions = CookieOptions::init()->withSameSite('None');
+        $cookieOptions = CookieOptions::init()->withSameSiteNone();
         $testCookie = new TestCookie($cookieOptions, []);
         $testCookie->set('foo', 'bar');
         $this->assertSame(
@@ -147,7 +147,7 @@ class CookieTest extends TestCase
      */
     public function testGetSameSiteNoneCookie()
     {
-        $cookieOptions = CookieOptions::init()->withSameSite('None');
+        $cookieOptions = CookieOptions::init()->withSameSiteNone();
         // "foo" cookie should take precedence
         $testCookie = new TestCookie($cookieOptions, ['foo'.Cookie::NO_SAME_SITE_POSTFIX => 'bar', 'foo' => 'baz']);
         $this->assertSame('baz', $testCookie->get('foo'));

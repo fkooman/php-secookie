@@ -1,8 +1,17 @@
 # ChangeLog
 
-## 3.1.0 (...)
+## 4.0.0 (...)
 - when `CookieOptions::setSameSite('None')` is used, the same cookie is also 
   sent without `SameSite` attribute for old(er) browsers
+- no longer have the option to disable setting `SameSite`, it has to be either
+  `None`, `Lax` or `Strict`
+- make `CookieOptions` and `SessionOptions` immutable and rename "setters" to
+  "withers"
+- introduce `CookieOptions::withSameSiteNone()`, 
+  `CookieOptions::withSameSiteLax()` and `CookieOptions::withSameSiteStrict()`
+  instead of string parameter for `CookieOptions::setSameSite()`
+- have `CookieOptions::withInsecure()` instead of bool parameter to 
+  `CookieOptions::setSecure()`
 
 ## 3.0.1 (2020-01-29)
 - use `Hex::encode()` from `paragonie/constant_time_encoding` for constant time
