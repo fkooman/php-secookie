@@ -51,14 +51,20 @@ In order to modify cookie options, the `CookieOptions` class can be used:
     <?php
 
     $myCookie = new fkooman\SeCookie\Cookie(
-        fkooman\SeCookie\CookieOptions::init()->setSameSite('Strict');
+        fkooman\SeCookie\CookieOptions::init()->withSameSiteStrict()
     );
     $myCookie->set('foo', 'bar');
 
-The methods `setSecure(bool)`, `setPath(string)`, `setMaxAge(int)` and 
-`setSameSite(string|null)` are available for `CookieOptions`. The values for
-`setSameSite` can be `Lax`, `Strict`, `None` or `null` where `null` means 
-not having `SameSite` as part of the cookie flags.
+You can use the following methods on `CookieOptions`:
+
+- `withPath(string)`
+- `withMaxAge(int)`
+- `withSameSiteNone()` - only use this if you need to allow third-party POST 
+  responses, e.g. when implementing a SAML SP
+- `withSameSiteLax()`
+- `withSameSiteStrict()`
+- `withoutSecure()` - omits the `Secure` flag from the cookie options, this 
+  is *ONLY* meant for development!
 
 ## Sessions
 
@@ -103,9 +109,9 @@ If you want to modify the session cookie options, you can also provide a
     $mySession = new fkooman\SeCookie\Session(
         // default SessionOptions
         fkooman\SeCookie\SessionOptions::init()
-            ->setName('SID')
-            ->setExpiresIn(new DateInterval('PT30M')),
-        fkooman\SeCookie\CookieOptions::init()->setSameSite('Strict')
+            ->withName('SID')
+            ->withExpiresIn(new DateInterval('PT30M')),
+        fkooman\SeCookie\CookieOptions::init()->withSameSiteStrict()
     );
 
     $mySession->start();
@@ -114,7 +120,8 @@ If you want to modify the session cookie options, you can also provide a
 
 By default, session "garbage collection" is enabled, and run every 100th 
 request. It will delete session cookies that expired according to the 
-`SessionOptions::setExpiresIn()` value.
+`SessionOptions::setExpiresIn()` value. To disable it you can use 
+`SessionOptions::withoutGc()`
 
 # Testing
 
