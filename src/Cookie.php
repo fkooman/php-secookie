@@ -63,7 +63,7 @@ class Cookie
                 'Set-Cookie: %s=%s; %s',
                 $cookieName,
                 $cookieValue,
-                \implode('; ', $this->cookieOptions->attributeValueList('' === $cookieValue))
+                \implode('; ', $this->cookieOptions->attributeValueList('' === $cookieValue, false))
             )
         );
 
@@ -80,15 +80,13 @@ class Cookie
         // @see https://www.chromium.org/updates/same-site
         // @see https://web.dev/samesite-cookie-recipes/#handling-incompatible-clients
         if ('None' === $this->cookieOptions->getSameSite()) {
-            $cookieOptions = clone $this->cookieOptions;
-            $cookieOptions->setSameSite(null);
             $this->sendHeader(
                 \sprintf(
                     'Set-Cookie: %s%s=%s; %s',
                     $cookieName,
                     self::NO_SAME_SITE_POSTFIX,
                     $cookieValue,
-                    \implode('; ', $cookieOptions->attributeValueList('' === $cookieValue))
+                    \implode('; ', $this->cookieOptions->attributeValueList('' === $cookieValue, true))
                 )
             );
         }

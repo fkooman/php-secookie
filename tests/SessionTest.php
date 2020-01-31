@@ -301,7 +301,7 @@ class SessionTest extends TestCase
             ]
         );
         $testSessionOne = new TestSession(new SessionOptions(), $testCookie, $testSessionStorage, 0, new DateTime('2019-01-01T08:00:00+00:00'));
-        $testSessionTwo = new TestSession(SessionOptions::init()->setName('TID'), $testCookie, $testSessionStorage, 0, new DateTime('2019-01-01T08:00:00+00:00'));
+        $testSessionTwo = new TestSession(SessionOptions::init()->withName('TID'), $testCookie, $testSessionStorage, 0, new DateTime('2019-01-01T08:00:00+00:00'));
 
         $testSessionOne->start();
         $this->assertSame('bar', $testSessionOne->get('foo'));

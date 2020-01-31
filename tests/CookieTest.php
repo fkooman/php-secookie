@@ -78,8 +78,7 @@ class CookieTest extends TestCase
      */
     public function testDeleteCookieWithMaxAge()
     {
-        $cookieOptions = new CookieOptions();
-        $cookieOptions->setMaxAge(12345);
+        $cookieOptions = CookieOptions::init()->withMaxAge(12345);
         $testCookie = new TestCookie($cookieOptions, []);
         $testCookie->delete('foo');
         $this->assertSame(
@@ -95,9 +94,7 @@ class CookieTest extends TestCase
      */
     public function testAttributeValues()
     {
-        $cookieOptions = new CookieOptions();
-        $cookieOptions->setPath('/foo/');
-        $cookieOptions->setMaxAge(12345);
+        $cookieOptions = CookieOptions::init()->withPath('/foo/')->withMaxAge(12345);
         $testCookie = new TestCookie($cookieOptions, []);
         $testCookie->set('foo', 'bar');
         $this->assertSame(
@@ -133,7 +130,7 @@ class CookieTest extends TestCase
      */
     public function testSetSameSiteNoneCookie()
     {
-        $cookieOptions = CookieOptions::init()->setSameSite('None');
+        $cookieOptions = CookieOptions::init()->withSameSite('None');
         $testCookie = new TestCookie($cookieOptions, []);
         $testCookie->set('foo', 'bar');
         $this->assertSame(
@@ -150,7 +147,7 @@ class CookieTest extends TestCase
      */
     public function testGetSameSiteNoneCookie()
     {
-        $cookieOptions = CookieOptions::init()->setSameSite('None');
+        $cookieOptions = CookieOptions::init()->withSameSite('None');
         // "foo" cookie should take precedence
         $testCookie = new TestCookie($cookieOptions, ['foo'.Cookie::NO_SAME_SITE_POSTFIX => 'bar', 'foo' => 'baz']);
         $this->assertSame('baz', $testCookie->get('foo'));

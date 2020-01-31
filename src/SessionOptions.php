@@ -58,11 +58,12 @@ class SessionOptions
      *
      * @return self
      */
-    public function setName($sessionName)
+    public function withName($sessionName)
     {
-        $this->sessionName = $sessionName;
+        $objCopy = clone $this;
+        $objCopy->sessionName = $sessionName;
 
-        return $this;
+        return $objCopy;
     }
 
     /**
@@ -74,11 +75,14 @@ class SessionOptions
     }
 
     /**
-     * @return void
+     * @return self
      */
-    public function setExpiresIn(DateInterval $expiresIn)
+    public function withExpiresIn(DateInterval $expiresIn)
     {
-        $this->expiresIn = $expiresIn;
+        $objCopy = clone $this;
+        $objCopy->expiresIn = $expiresIn;
+
+        return $objCopy;
     }
 
     /**
@@ -90,11 +94,14 @@ class SessionOptions
     }
 
     /**
-     * @return void
+     * @return self
      */
-    public function disableGc()
+    public function withoutGc()
     {
-        $this->garbageCollection = false;
+        $objCopy = clone $this;
+        $objCopy->garbageCollection = false;
+
+        return $objCopy;
     }
 
     /**

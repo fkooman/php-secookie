@@ -37,7 +37,7 @@ class CookieOptions
     /** @var int|null */
     private $maxAge = null;
 
-    /** @var string|null */
+    /** @var string */
     private $sameSite = 'Lax';
 
     /**
@@ -53,11 +53,12 @@ class CookieOptions
      *
      * @return self
      */
-    public function setSecure($secure)
+    public function withSecure($secure)
     {
-        $this->secure = $secure;
+        $objCopy = clone $this;
+        $objCopy->secure = $secure;
 
-        return $this;
+        return $objCopy;
     }
 
     /**
@@ -65,11 +66,12 @@ class CookieOptions
      *
      * @return self
      */
-    public function setPath($path)
+    public function withPath($path)
     {
-        $this->path = $path;
+        $objCopy = clone $this;
+        $objCopy->path = $path;
 
-        return $this;
+        return $objCopy;
     }
 
     /**
@@ -77,35 +79,37 @@ class CookieOptions
      *
      * @return self
      */
-    public function setMaxAge($maxAge)
+    public function withMaxAge($maxAge)
     {
         if (0 >= $maxAge) {
             throw new CookieException('"MaxAge" must be positive');
         }
-        $this->maxAge = $maxAge;
 
-        return $this;
+        $objCopy = clone $this;
+        $objCopy->maxAge = $maxAge;
+
+        return $objCopy;
     }
 
     /**
-     * @param string|null $sameSite
+     * @param string $sameSite
      *
      * @return self
      */
-    public function setSameSite($sameSite)
+    public function withSameSite($sameSite)
     {
-        if (null !== $sameSite) {
-            if (!\in_array($sameSite, ['Strict', 'Lax', 'None'], true)) {
-                throw new CookieException(\sprintf('"%s" is not a supported value for "SameSite"', $sameSite));
-            }
+        if (!\in_array($sameSite, ['Strict', 'Lax', 'None'], true)) {
+            throw new CookieException(\sprintf('"%s" is not a supported value of "SameSite"', $sameSite));
         }
-        $this->sameSite = $sameSite;
 
-        return $this;
+        $objCopy = clone $this;
+        $objCopy->sameSite = $sameSite;
+
+        return $objCopy;
     }
 
     /**
-     * @return string|null
+     * @return string
      */
     public function getSameSite()
     {
@@ -114,10 +118,11 @@ class CookieOptions
 
     /**
      * @param bool $deleteCookie
+     * @param bool $dropSameSiteNone
      *
      * @return array<string>
      */
-    public function attributeValueList($deleteCookie)
+    public function attributeValueList($deleteCookie, $dropSameSiteNone)
     {
         $attributeValueList = [
             'HttpOnly',  // all cookies are ALWAYS "HttpOnly"
@@ -128,8 +133,8 @@ class CookieOptions
         if (null !== $path = $this->path) {
             $attributeValueList[] = \sprintf('Path=%s', $path);
         }
-        if (null !== $sameSite = $this->sameSite) {
-            $attributeValueList[] = \sprintf('SameSite=%s', $sameSite);
+        if (!$dropSameSiteNone) {
+            $attributeValueList[] = \sprintf('SameSite=%s', $this->sameSite);
         }
         if (null !== $maxAge = $this->determineMaxAge($deleteCookie)) {
             $attributeValueList[] = \sprintf('Max-Age=%d', $maxAge);
