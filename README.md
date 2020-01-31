@@ -1,10 +1,10 @@
 # Introduction
 
-This is a simple and secure cookie and session library written in PHP. It does 
-NOT use any of PHP's built-in cookie/session functions.
+This is a simple to use and secure cookie and session library written in PHP. 
+It does not use any of PHP's built-in cookie/session functions.
 
 An extensive set of unit tests are included, testing all aspects of the 
-library.
+library including "integration" tests using the built-in PHP web server.
 
 Many thanks to Jørn Åne de Jong (Uninett) for invaluable feedback during the
 development.
@@ -22,15 +22,6 @@ For our application we also require support of multiple parallel sessions, this
 does not seem possible with PHP. With the introduction of the `SameSite` cookie 
 value, this became even more important.
 
-It turns out, the easiest way to proceed is to write a library that avoids
-using PHP's built-in session support and use secure defaults (famous last 
-words). The most difficult part is the 
-[session locking](https://ma.ttias.be/php-session-locking-prevent-sessions-blocking-in-requests/). 
-Also, [this](https://www.php.net/manual/en/features.session.security.management.php) 
-is rather scary material to read. Please read it if your application uses 
-sessions! If you prefer to go "the PHP way", please read 
-[this](https://paragonie.com/blog/2015/04/fast-track-safe-and-secure-php-sessions).
-
 # API
 
 ## Cookies
@@ -40,88 +31,89 @@ Create a cookie `foo` with the value `bar`:
     <?php
 
     $myCookie = new fkooman\SeCookie\Cookie();
-
     if(null === $cookieValue = $myCookie->get('foo')) {
         // no value for cookie "foo" (yet)
         $myCookie->set('foo', 'bar');
     }
 
-In order to modify cookie options, the `CookieOptions` class can be used:
+## Sessions
+
+Start a new session, store a key `foo` with value `bar`, get the session value
+again, remove it and stop the session:
+
+    <?php
+
+    $mySession = new fkooman\SeCookie\Session();
+    $mySession->start();
+    $mySession->set('foo', 'bar');
+    echo $mySession->get('foo');
+    $mySession->remove('foo');
+    $mySession->stop();
+
+Note that stopping the session is also done automatically at the end of the 
+script using the destructor, so only call this if you need to stop the session
+and write the session data to storage.
+
+You can also regenerate the session ID, typically you do this *before* storing
+important information in the session data, e.g. whether or not the user is 
+logged in:
+
+    $mySession->regenerate();
+
+You can also completely destroy the session and remove the session data:
+
+    $mySession->destroy();
+
+The `Session::set` method only takes `string` as a second parameter. You MUST 
+convert everything you want to store in your sessions to `string`, e.g. using 
+PHP's built-in `serialize()` function.
+
+## Options
+
+### Cookie
+
+In order to modify cookie options, a `CookieOptions` object can be used as the
+parameter to the `Cookie` constructor, e.g.:
 
     <?php
 
     $myCookie = new fkooman\SeCookie\Cookie(
         fkooman\SeCookie\CookieOptions::init()->withSameSiteStrict()
     );
-    $myCookie->set('foo', 'bar');
 
 You can use the following methods on `CookieOptions`:
 
-- `withPath(string)`
-- `withMaxAge(int)`
+- `withPath(string)` - restrict the cookie to the provided path. The default
+  restricts the cookie to the URL path that issues the cookie;
+- `withMaxAge(int)` - specify the maximum lifetime of the cookie in seconds;
 - `withSameSiteNone()` - only use this if you need to allow third-party POST 
   responses, e.g. when implementing a SAML SP
-- `withSameSiteLax()`
-- `withSameSiteStrict()`
+- `withSameSiteLax()` - only send the cookie for safe HTTP request methods that 
+  have no side effects, e.g. `GET` and `HEAD`, but not for `POST`;
+- `withSameSiteStrict()` - do not send any cookie for any cross domain request
 - `withoutSecure()` - omits the `Secure` flag from the cookie options, this 
   is *ONLY* meant for development!
 
-## Sessions
+### Session
 
-Start a new session, store a key `foo` with value `bar`:
-
-    <?php
-
-    $mySession = new fkooman\SeCookie\Session();
-    $mySession->start();
-
-    // ... 
-
-    $mySession->set('foo', 'bar');
-
-    // ...
-
-    echo $mySession->get('foo');
-
-    // ...
-
-    $mySession->remove('foo');
-    
-    // ...
-
-    $mySession->regenerate();
-
-    // ...
-
-    $mySession->destroy();
-
-    // ...
-
-The `Session::set` only takes `string` as a second parameter. You MUST convert 
-everything you want to store in your sessions to `string`, e.g. using PHP's 
-built-in `serialize()` function.
-
-If you want to modify the session cookie options, you can also provide a 
-`CookieOptions` object to the `Session` constructor:
+In order to modify session options, a `SessionOptions` object can be used as 
+the first parameter to the `Session` constructor. If you also want to modify 
+the `CookieOptions`, specify a `CookieOptions` object as the second parameter,
+e.g.:
 
     <?php
 
     $mySession = new fkooman\SeCookie\Session(
-        // default SessionOptions
-        fkooman\SeCookie\SessionOptions::init()
-            ->withName('SID')
-            ->withExpiresIn(new DateInterval('PT30M')),
+        fkooman\SeCookie\SessionOptions::init()->withName('MYSID'),
         fkooman\SeCookie\CookieOptions::init()->withSameSiteStrict()
     );
 
-    $mySession->start();
+You can use the following methods on `SessionOptions`:
 
-    // ...
-
-By default, session "garbage collection" is enabled, and run every 100th 
-request. It will delete session cookies that expired according to the 
-`SessionOptions::setExpiresIn()` value. To disable it you can use 
-`SessionOptions::withoutGc()`
+- `withName(string)` - specify the session name. The default is `SID`;
+- `withExpiresIn(DateInterval)` - specify the time a session is valid, on the
+  server,. The default is `new DateInterval('PT30M')`, which is 30 minutes;
+- `withoutGc()` - disable session garbage collection every 100th request.
 
 # Testing
 
@@ -137,6 +129,12 @@ conditions or deadlocks as they would require multiple "parallel" requests.
 For that purpose we start multiple PHP web servers and run `curl` against it. 
 Check the `additional_tests` directory. Run `run_tests.sh` from there. If all 
 goes well the test prints `OK` at the end.
+
+# Required Reading
+
+- [Session Locking](https://ma.ttias.be/php-session-locking-prevent-sessions-blocking-in-requests/)
+- [PHP Session Security Management](https://www.php.net/manual/en/features.session.security.management.php) 
+- [Safe and Secure PHP sessions](https://paragonie.com/blog/2015/04/fast-track-safe-and-secure-php-sessions)
 
 # License
 
