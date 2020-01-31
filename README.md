@@ -1,5 +1,8 @@
 # Introduction
 
+**TODO / XXX**
+- be more clear about what this SameSite stuff does!
+
 This is a simple to use and secure cookie and session library written in PHP. 
 It does not use any of PHP's built-in cookie/session functions.
 
@@ -94,6 +97,10 @@ You can use the following methods on `CookieOptions`:
 - `withoutSecure()` - omits the `Secure` flag from the cookie options, this 
   is *ONLY* meant for development!
 
+**NOTE**: `CookieOptions` is immutable. This means that when you call `withX()` 
+or `withoutX()` you get a copy of the current `CookieOptions` with the new 
+value set. It will NOT modify the existing object!
+
 ### Session
 
 In order to modify session options, a `SessionOptions` object can be used as 
@@ -114,6 +121,10 @@ You can use the following methods on `SessionOptions`:
 - `withExpiresIn(DateInterval)` - specify the time a session is valid, on the
   server,. The default is `new DateInterval('PT30M')`, which is 30 minutes;
 - `withoutGc()` - disable session garbage collection every 100th request.
+
+**NOTE**: `SessionOptions` is immutable. This means that when you call `withX()` 
+or `withoutX()` you get a copy of the current `SessionOptions` with the new 
+value set. It will NOT modify the existing object!
 
 # Testing
 
