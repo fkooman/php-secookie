@@ -2,7 +2,8 @@
 
 ## 4.0.0 (...)
 - when `CookieOptions::setSameSite('None')` is used, the same cookie is also 
-  sent without `SameSite` attribute for old(er) browsers
+  sent without `SameSite` attribute for browsers that interpret `None` as 
+  `Strict`, most notably iOS 12 devices
 - no longer have the option to disable setting `SameSite`, it has to be either
   `None`, `Lax` or `Strict`
 - make `CookieOptions` and `SessionOptions` immutable and rename "setters" to
