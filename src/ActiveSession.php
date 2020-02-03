@@ -96,7 +96,7 @@ class ActiveSession
         /** @var mixed $sessionValue */
         $sessionValue = $this->sessionData[$sessionKey];
         if (!\is_string($sessionValue)) {
-            // XXX probabaly throw exception?
+            // if the value is NOT a string, pretend it is not there...
             return null;
         }
 
