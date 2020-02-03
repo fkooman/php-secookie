@@ -1,8 +1,5 @@
 # Introduction
 
-**TODO / XXX**
-- be more clear about what this SameSite stuff does!
-
 This is a simple to use and secure cookie and session library written in PHP. 
 It does not use any of PHP's built-in cookie/session functions.
 
@@ -89,10 +86,11 @@ You can use the following methods on `CookieOptions`:
 - `withPath(string)` - restrict the cookie to the provided path. The default
   restricts the cookie to the URL path that issues the cookie;
 - `withMaxAge(int)` - specify the maximum lifetime of the cookie in seconds;
-- `withSameSiteNone()` - only use this if you need to allow third-party POST 
+- `withSameSiteNone()` - only use this if you need to allow cross domain POST 
   responses, e.g. when implementing a SAML SP
-- `withSameSiteLax()` - only send the cookie for safe HTTP request methods that 
-  have no side effects, e.g. `GET` and `HEAD`, but not for `POST`;
+- `withSameSiteLax()` - only send the cookie for cross domain "top level 
+  navigation", not for methods that can change state on the server, e.g. `POST` 
+  requests;
 - `withSameSiteStrict()` - do not send any cookie for any cross domain request
 - `withoutSecure()` - omits the `Secure` flag from the cookie options, this 
   is *ONLY* meant for development!
@@ -146,6 +144,7 @@ goes well the test prints `OK` at the end.
 - [Session Locking](https://ma.ttias.be/php-session-locking-prevent-sessions-blocking-in-requests/)
 - [PHP Session Security Management](https://www.php.net/manual/en/features.session.security.management.php) 
 - [Safe and Secure PHP sessions](https://paragonie.com/blog/2015/04/fast-track-safe-and-secure-php-sessions)
+- [Cookies: HTTP State Management Mechanism](https://tools.ietf.org/html/draft-ietf-httpbis-rfc6265bis-04)
 
 # License
 
