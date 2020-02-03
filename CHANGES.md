@@ -1,6 +1,6 @@
 # ChangeLog
 
-## 4.0.0 (...)
+## 4.0.0 (2020-02-03)
 - when `CookieOptions::setSameSite('None')` is used, the same cookie is also 
   sent without `SameSite` attribute for browsers that interpret `None` as 
   `Strict`, most notably iOS 12 devices
