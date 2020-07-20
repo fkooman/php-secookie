@@ -1,6 +1,6 @@
 # ChangeLog
 
-## 4.0.1 (...)
+## 4.0.1 (2020-07-20)
 - drop `paragonie/constant_time_encoding` dependency and use `sodium_bin2hex` 
   when available
 
