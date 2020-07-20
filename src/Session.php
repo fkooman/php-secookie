@@ -228,13 +228,29 @@ class Session
     private function createSession(array $sessionData = [])
     {
         $sessionName = $this->sessionOptions->getName();
-        $sessionId = Compat::bin2hex($this->getRandomBytes());
+        $sessionId = self::bin2hex($this->getRandomBytes());
         $activeSession = new ActiveSession($sessionId, $sessionData);
         // override/set the expiry of the session
         $activeSession->set('__expires_at', $this->calculateExpiresAt());
         $this->sessionStorage->create($sessionId);
         $this->activeSession = $activeSession;
         $this->cookie->set($sessionName, $sessionId);
+    }
+
+    /**
+     * @param string $binStr
+     *
+     * @return string
+     */
+    private static function bin2hex($binStr)
+    {
+        // in case we have ext-sodium installed we use it for constant time
+        // binary to hex encoding...
+        if (\function_exists('\sodium_bin2hex')) {
+            return \sodium_bin2hex($binStr);
+        }
+
+        return \bin2hex($binStr);
     }
 
     /**

@@ -28,8 +28,7 @@
         "phpunit/phpunit": "^4.8.35|^5|^6|^7"
     },
     "suggest": {
-        "ext-sodium": "for constant time bin2hex",
-        "ext-libsodium": "for constant time bin2hex"
+        "ext-sodium": "https://www.php.net/sodium_bin2hex"
     },
     "support": {
         "email": "fkooman@tuxed.net",
