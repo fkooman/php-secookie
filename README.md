@@ -124,6 +124,12 @@ You can use the following methods on `SessionOptions`:
 or `withoutX()` you get a copy of the current `SessionOptions` with the new 
 value set. It will NOT modify the existing object!
 
+# Security
+
+This library uses `bin2hex` to convert a binary random string to "hex". It will
+use the `sodium_bin2hex` function if available. It is highly recommended you
+install the `php-sodium` extension. It is a core extension since PHP 7.2.
+
 # Testing
 
 [PHPUnit](https://phpunit.de/) tests are included. You can easily run them:
