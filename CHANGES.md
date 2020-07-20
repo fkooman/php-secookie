@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 4.0.1 (...)
+- drop `paragonie/constant_time_encoding` dependency and use `sodium_bin2hex` 
+  when available
+
 ## 4.0.0 (2020-02-03)
 - when `CookieOptions::setSameSite('None')` is used, the same cookie is also 
   sent without `SameSite` attribute for browsers that interpret `None` as 
