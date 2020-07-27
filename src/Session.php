@@ -240,21 +240,15 @@ class Session
     {
         // ext-sodium
         if (\function_exists('\sodium_bin2hex')) {
-            \error_log('sodium_bin2hex');
-
             return \sodium_bin2hex($binStr);
         }
 
         // ext-libsodium
         if (\function_exists('\Sodium\bin2hex')) {
-            \error_log('\Sodium\bin2hex');
-
             return \Sodium\bin2hex($binStr);
         }
 
         // PHP bin2hex (not constant-time)
-        \error_log('PHP bin2hex');
-
         return \bin2hex($binStr);
     }
 
