@@ -1,5 +1,11 @@
 # ChangeLog
 
+## 4.1.0 (...)
+- drop support for (periodically) garbage collection as that does not work on 
+  Debian/Ubuntu anyway.
+- try `sodium_bin2hex`, `\Sodium\bin2hex` and ultimately fallback to `bin2hex`
+  for encoding the session ID
+
 ## 4.0.1 (2020-07-20)
 - drop `paragonie/constant_time_encoding` dependency and use `sodium_bin2hex` 
   when available

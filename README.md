@@ -118,7 +118,6 @@ You can use the following methods on `SessionOptions`:
 - `withName(string)` - specify the session name. The default is `SID`;
 - `withExpiresIn(DateInterval)` - specify the time a session is valid, on the
   server,. The default is `new DateInterval('PT30M')`, which is 30 minutes;
-- `withoutGc()` - disable session garbage collection every 100th request.
 
 **NOTE**: `SessionOptions` is immutable. This means that when you call `withX()` 
 or `withoutX()` you get a copy of the current `SessionOptions` with the new 
@@ -129,6 +128,48 @@ value set. It will NOT modify the existing object!
 This library uses `bin2hex` to convert a binary random string to "hex". It will
 use the `sodium_bin2hex` function if available. It is highly recommended you
 install the `php-sodium` extension. It is a core extension since PHP 7.2.
+
+# Garbage Collection
+
+In order to clean expired sessions from the disk, you can run the following 
+command:
+
+## CentOS
+
+    $ sudo /usr/bin/find /var/lib/php/session -type f -mtime +0 -delete
+
+## Debian/Ubuntu
+
+    $ sudo /usr/bin/find /var/lib/php/sessions -type f -mtime +0 -delete
+
+This will delete the sessions that haven't been modified in the last 24 hours 
+and thus are far beyond their validity. See `find(1)` for more information.
+
+You can also install a `systemd` timer/service to automate this, for example:
+
+`php-fkooman-secookie.service`:
+```
+[Unit]
+Description=Remove old PHP session files (php-fkooman-secookie)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/find /var/lib/php/session -type f -mtime +0 -delete
+```
+
+`php-fkooman-secookie.timer`:
+```
+[Unit]
+Description=Remove old PHP session files (php-fkooman-secookie) every hour
+
+[Timer]
+OnCalendar=*-*-* *:00:00
+RandomizedDelaySec=900
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
 
 # Testing
 
