@@ -37,9 +37,6 @@ class SessionOptions
     /** @var \DateInterval */
     private $expiresIn;
 
-    /** @var bool */
-    private $garbageCollection = true;
-
     public function __construct()
     {
         $this->expiresIn = new DateInterval(self::SESSION_EXPIRY_DEFAULT);
@@ -94,21 +91,23 @@ class SessionOptions
     }
 
     /**
+     * @deprecated
+     *
      * @return self
      */
     public function withoutGc()
     {
-        $objCopy = clone $this;
-        $objCopy->garbageCollection = false;
-
-        return $objCopy;
+        // does nothing anymore, will be removed in 5.x
+        return clone $this;
     }
 
     /**
+     * @deprecated
+     *
      * @return bool
      */
     public function getGc()
     {
-        return $this->garbageCollection;
+        return false;
     }
 }
