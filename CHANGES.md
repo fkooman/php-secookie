@@ -1,6 +1,6 @@
 # ChangeLog
 
-## 5.0.0 (...)
+## 5.0.0 (2020-07-28)
 - remove built-in session garbage collection as it does not work on 
   Debian/Ubuntu
 - document in README.md how to do garbage collection
