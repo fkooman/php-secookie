@@ -230,6 +230,8 @@ class Session
     }
 
     /**
+     * Use constant-time "bin2hex" if possible.
+     *
      * @suppress PhanUndeclaredFunction
      *
      * @param string $binStr
@@ -248,7 +250,7 @@ class Session
             return \Sodium\bin2hex($binStr);
         }
 
-        // PHP bin2hex (not constant-time)
+        // fallback to PHP bin2hex (not constant-time)
         return \bin2hex($binStr);
     }
 

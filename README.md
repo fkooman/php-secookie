@@ -20,7 +20,10 @@ PHP 7.
 
 For our application we also require support of multiple parallel sessions, this
 does not seem possible with PHP. With the introduction of the `SameSite` cookie 
-value, this became even more important.
+value, this became even more important as in some situations it is recommended
+to use multiple sessions in parallel with different `SameSite` values, see 
+e.g. section 8.8.2 of 
+[Cookies: HTTP State Management Mechanism](https://tools.ietf.org/html/draft-ietf-httpbis-rfc6265bis-06#section-8.8.2).
 
 # API
 
@@ -46,7 +49,9 @@ again, remove it and stop the session:
     $mySession = new fkooman\SeCookie\Session();
     $mySession->start();
     $mySession->set('foo', 'bar');
+
     echo $mySession->get('foo');
+
     $mySession->remove('foo');
     $mySession->stop();
 
@@ -131,45 +136,12 @@ install the `php-sodium` extension. It is a core extension since PHP 7.2.
 
 # Garbage Collection
 
-In order to clean expired sessions from the disk, you can run the following 
-command:
+In order to periodically remove expired sessions from the disk, you can use the 
+following command, and for example run it daily from cron:
 
-## CentOS
+    $ sudo /usr/bin/find /var/lib/php/sessions -type f -name "sses_*" -mtime +0 -delete
 
-    $ sudo /usr/bin/find /var/lib/php/session -type f -mtime +0 -delete
-
-## Debian/Ubuntu
-
-    $ sudo /usr/bin/find /var/lib/php/sessions -type f -mtime +0 -delete
-
-This will delete the sessions that haven't been modified in the last 24 hours 
-and thus are far beyond their validity. See `find(1)` for more information.
-
-You can also install a `systemd` timer/service to automate this, for example:
-
-`php-fkooman-secookie.service`:
-```
-[Unit]
-Description=Remove old PHP session files (php-fkooman-secookie)
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/find /var/lib/php/session -type f -mtime +0 -delete
-```
-
-`php-fkooman-secookie.timer`:
-```
-[Unit]
-Description=Remove old PHP session files (php-fkooman-secookie) every hour
-
-[Timer]
-OnCalendar=*-*-* *:00:00
-RandomizedDelaySec=900
-Persistent=true
-
-[Install]
-WantedBy=timers.target
-```
+On Debian/Ubuntu use `/var/lib/php/sessions`, note the extra `s`, instead.
 
 # Testing
 
