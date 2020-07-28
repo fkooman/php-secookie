@@ -89,25 +89,4 @@ class SessionOptions
     {
         return $this->expiresIn;
     }
-
-    /**
-     * @deprecated
-     *
-     * @return self
-     */
-    public function withoutGc()
-    {
-        // does nothing anymore, will be removed in 5.x
-        return clone $this;
-    }
-
-    /**
-     * @deprecated
-     *
-     * @return bool
-     */
-    public function getGc()
-    {
-        return false;
-    }
 }
