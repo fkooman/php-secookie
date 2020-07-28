@@ -1,8 +1,8 @@
 # ChangeLog
 
-## 4.1.0 (...)
-- drop support for (periodically) garbage collection as that does not work on 
-  Debian/Ubuntu anyway.
+## 4.0.2 (...)
+- drop support for built-in garbage collection as that does not work on 
+  Debian/Ubuntu anyway
 - try `sodium_bin2hex`, `\Sodium\bin2hex` and ultimately fallback to `bin2hex`
   for encoding the session ID
 

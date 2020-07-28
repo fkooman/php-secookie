@@ -137,11 +137,11 @@ install the `php-sodium` extension. It is a core extension since PHP 7.2.
 # Garbage Collection
 
 In order to periodically remove expired sessions from the disk, you can use the 
-following command, and for example run it daily from cron:
+following command, and for example run it daily from `cron(8)`:
 
-    $ sudo /usr/bin/find /var/lib/php/sessions -type f -name "sses_*" -mtime +0 -delete
+    $ sudo /usr/bin/find /var/lib/php/session -type f -name "sses_*" -mtime +0 -delete
 
-On Debian/Ubuntu use `/var/lib/php/sessions`, note the extra `s`, instead.
+On Debian/Ubuntu use `/var/lib/php/sessions`, note the extra `s` at the end.
 
 # Testing
 
