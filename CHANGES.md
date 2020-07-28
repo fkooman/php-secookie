@@ -3,6 +3,7 @@
 ## 5.0.0 (...)
 - remove built-in session garbage collection as it does not work on 
   Debian/Ubuntu
+- document in README.md how to do garbage collection
 - try `sodium_bin2hex`, `\Sodium\bin2hex`, `bin2hex`, in that order, to encode 
   the session identifier
 
