@@ -1,10 +1,10 @@
 # ChangeLog
 
-## 4.0.2 (...)
-- drop support for built-in garbage collection as that does not work on 
-  Debian/Ubuntu anyway
-- try `sodium_bin2hex`, `\Sodium\bin2hex` and ultimately fallback to `bin2hex`
-  for encoding the session ID
+## 5.0.0 (...)
+- remove built-in session garbage collection as it does not work on 
+  Debian/Ubuntu
+- try `sodium_bin2hex`, `\Sodium\bin2hex`, `bin2hex`, in that order, to encode 
+  the session identifier
 
 ## 4.0.1 (2020-07-20)
 - drop `paragonie/constant_time_encoding` dependency and use `sodium_bin2hex` 

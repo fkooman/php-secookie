@@ -47,15 +47,6 @@ class TestSessionStorage extends SessionStorage
         foreach ($sessionList as $sessionId => $sessionData) {
             $sessionFile = \sprintf('%s/%s%s', $this->tmpDir, self::SESSION_FILE_PREFIX, $sessionId);
             \file_put_contents($sessionFile, \serialize($sessionData));
-            // set filemtime for this special session file to test GC
-            // this one should NOT be cleared!
-            if ($sessionFile === \sprintf('%s/%s7878787878787878787878787878787878787878787878787878787878787878', $this->tmpDir, self::SESSION_FILE_PREFIX)) {
-                \touch($sessionFile, (int) ($this->dateTime->getTimestamp() - 4 * 60 * 60));
-            }
-            // this one should be cleared!
-            if ($sessionFile === \sprintf('%s/%s8989898989898989898989898989898989898989898989898989898989898989', $this->tmpDir, self::SESSION_FILE_PREFIX)) {
-                \touch($sessionFile, (int) ($this->dateTime->getTimestamp() - 10 * 60 * 60));
-            }
         }
     }
 

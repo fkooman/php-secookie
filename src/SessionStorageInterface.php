@@ -24,8 +24,6 @@
 
 namespace fkooman\SeCookie;
 
-use DateInterval;
-
 interface SessionStorageInterface
 {
     /**
@@ -53,9 +51,4 @@ interface SessionStorageInterface
      * @return void
      */
     public function destroy($sessionId);
-
-    /**
-     * @return void
-     */
-    public function gc(DateInterval $expiresIn);
 }

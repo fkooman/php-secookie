@@ -24,7 +24,6 @@
 
 namespace fkooman\SeCookie;
 
-use DateInterval;
 use DateTime;
 use fkooman\SeCookie\Exception\SessionException;
 
@@ -132,28 +131,6 @@ class SessionStorage implements SessionStorageInterface
             throw new SessionException('unable to delete session data');
         }
         $this->unlock($sessionId);
-    }
-
-    /**
-     * @return void
-     */
-    public function gc(DateInterval $expiresIn)
-    {
-        // loop over all session files and delete the session files that
-        // haven't been modified for the amount of time specified in expiresIn
-        $expiresAt = clone $this->dateTime;
-        $expiresAt->sub($expiresIn);
-        $sessionFileFilter = \sprintf('%s/%s*', $this->sessionDir, self::SESSION_FILE_PREFIX);
-        if (false === $sessionFileList = \glob($sessionFileFilter)) {
-            // unable to list files in sessionDir, nothing we can do...
-            return;
-        }
-        foreach ($sessionFileList as $sessionFile) {
-            $lastModified = \filemtime($sessionFile);
-            if ($lastModified < $expiresAt->getTimestamp()) {
-                \unlink($sessionFile);
-            }
-        }
     }
 
     /**
