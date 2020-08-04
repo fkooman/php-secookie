@@ -15,7 +15,7 @@
             "fkooman\\SeCookie\\Tests\\": "tests/"
         }
     },
-    "description": "Secure cookie and session library",
+    "description": "Modern HTTP cookie and session library",
     "license": "MIT",
     "name": "fkooman/secookie",
     "require": {

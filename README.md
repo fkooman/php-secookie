@@ -1,3 +1,9 @@
+**Summary**: Modern HTTP cookie and session library
+
+**Description**: An easy to use, secure, simple and modern PHP cookie and 
+session library supporting multiple parallel sessions without using PHP's 
+session management.
+
 # Introduction
 
 This is a simple to use and secure cookie and session library written in PHP. 
@@ -14,7 +20,7 @@ development.
 The existing PHP way of using and configuring cookies and sessions is 
 complicated and not secure by default. It has various configuration flags in 
 `php.ini` that also vary in different versions of PHP. There are some 
-libraries that improve this, but they usually require a PHP version >= 5.4. 
+libraries that improve this, but they usually require a PHP version > 5.4. 
 This library support all version of PHP >= 5.4, including all versions of 
 PHP 7.
 
@@ -128,6 +134,9 @@ You can use the following methods on `SessionOptions`:
 or `withoutX()` you get a copy of the current `SessionOptions` with the new 
 value set. It will NOT modify the existing object!
 
+By creating multiple `Session` objects, you can have multiple parallel 
+sessions.
+
 # Security
 
 This library uses `bin2hex` to convert a binary random string to "hex". It will
@@ -137,11 +146,15 @@ install the `php-sodium` extension. It is a core extension since PHP 7.2.
 # Garbage Collection
 
 In order to periodically remove expired sessions from the disk, you can use the 
-following command, and for example run it daily from `cron(8)`:
+following command, or for example run it daily from `cron(8)`.
+
+On CentOS/Fedora:
 
     $ sudo /usr/bin/find /var/lib/php/session -type f -name "sses_*" -mtime +0 -delete
 
-On Debian/Ubuntu use `/var/lib/php/sessions`, note the extra `s` at the end.
+On Debian/Ubuntu:
+
+    $ sudo /usr/bin/find /var/lib/php/sessions -type f -name "sses_*" -mtime +0 -delete
 
 # Testing
 
