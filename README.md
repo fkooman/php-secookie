@@ -4,6 +4,8 @@
 session library supporting multiple parallel sessions without using PHP's 
 session management.
 
+**License**: MIT
+
 # Introduction
 
 This is a simple to use and secure cookie and session library written in PHP. 
