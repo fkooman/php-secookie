@@ -139,12 +139,6 @@ value set. It will NOT modify the existing object!
 By creating multiple `Session` objects, you can have multiple parallel 
 sessions.
 
-# Security
-
-This library uses `bin2hex` to convert a binary random string to "hex". It will
-use the `sodium_bin2hex` function if available. It is highly recommended you
-install the `php-sodium` extension. It is a core extension since PHP 7.2.
-
 # Garbage Collection
 
 In order to periodically remove expired sessions from the disk, you can use the 
