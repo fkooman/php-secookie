@@ -343,7 +343,6 @@ return [
     'directory_list' => [
         'src',
         'tests',
-        'vendor/paragonie/constant_time_encoding/src',
         'vendor/phpunit/phpunit/src',
     ],
 
