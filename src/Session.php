@@ -26,6 +26,7 @@ namespace fkooman\SeCookie;
 
 use DateTime;
 use fkooman\SeCookie\Exception\SessionException;
+use ParagonIE\ConstantTime\Hex;
 
 class Session
 {
@@ -220,7 +221,7 @@ class Session
     private function createSession(array $sessionData = [])
     {
         $sessionName = $this->sessionOptions->getName();
-        $sessionId = Encoding::bin2hex($this->getRandomBytes());
+        $sessionId = Hex::encode($this->getRandomBytes());
         $activeSession = new ActiveSession($sessionId, $sessionData);
         // override/set the expiry of the session
         $activeSession->set('__expires_at', $this->calculateExpiresAt());

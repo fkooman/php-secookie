@@ -1,5 +1,8 @@
 # ChangeLog
 
+## 5.0.1 (...)
+- restore use of `paragonie/constant_time_encoding` for now
+
 ## 5.0.0 (2020-07-28)
 - remove built-in session garbage collection as it does not work on 
   Debian/Ubuntu
