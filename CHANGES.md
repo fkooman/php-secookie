@@ -1,7 +1,8 @@
 # ChangeLog
 
-## 5.0.1 (...)
+## 5.0.1 (2020-08-09)
 - restore use of `paragonie/constant_time_encoding` for now
+- update README
 
 ## 5.0.0 (2020-07-28)
 - remove built-in session garbage collection as it does not work on 
