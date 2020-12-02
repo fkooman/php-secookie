@@ -45,6 +45,9 @@ class Session
     /** @var ActiveSession|null */
     private $activeSession = null;
 
+    /** @var bool */
+    private $resumedSession = false;
+
     public function __construct(SessionOptions $sessionOptions = null, CookieOptions $cookieOptions = null)
     {
         if (null === $sessionOptions) {
@@ -114,7 +117,8 @@ class Session
             return;
         }
 
-        // we have a valid session
+        // we have a valid session, this one is not created new
+        $this->resumedSession = true;
         $this->activeSession = $activeSession;
     }
 
@@ -182,6 +186,19 @@ class Session
     {
         $activeSession = $this->requireActiveSession();
         $activeSession->remove($sessionKey);
+    }
+
+    /**
+     * Check whether the session was resumed, i.e.: the user agent presented
+     * a valid session cookie, or it is new session, i.e.: no valid session
+     * cookie was presented. Can be used to detect disabled cookies in user
+     * agents.
+     *
+     * @return bool
+     */
+    public function isResumedSession()
+    {
+        return $this->resumedSession;
     }
 
     /**
